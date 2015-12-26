@@ -10,18 +10,19 @@
 
 struct fase{
     int id_fase;
+    int tempo_atendimento;
     int tempo_chegada;
     int tempo_partida;
 };
 
-typedef struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
+struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
     int id;
     struct fase fase;
     int prioridade;
-} utente;
+};
 
 typedef struct node{//no node tem pessoa e prox
-    utente pes;
+    struct utente utente;
     struct node * prox; //ponteiro pro proximo node;
 } node;
 
@@ -34,10 +35,12 @@ typedef struct fila{
 
 //funcoes da fila
 void inicializar_fila(fila *f);
+void limpar_fila(fila *f);
 int vazia(fila * f);
-int inserir(utente pes, fila * f); // a fila é ponteiro pq é unica
-utente remover_inicio(fila * f);
+int inserir(struct utente utente, fila * f); // a fila é ponteiro pq é unica
+struct utente remover_inicio(fila * f);
 void listar(fila * f);
+void imprimir_utente(char mensagem[], struct utente utente);
 
 
 #endif	/* FILA_H */

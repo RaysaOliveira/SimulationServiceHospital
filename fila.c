@@ -9,16 +9,23 @@ int vazia(fila *f){
 }
 
 void inicializar_fila(fila *f){
-    while(!vazia(f))
-      remover_inicio(f);
+    f->inicio = NULL;
+    f->fim = NULL;
+    f->quant_atual = 0;
+    f->total_utentes_chegados = 0;
 }
 
-int inserir(utente pes, fila *f){
+void limpar_fila(fila *f){
+    while(!vazia(f))
+        remover_inicio(f);
+}
+
+int inserir(struct utente utente, fila *f){
     node *novo = (node *)malloc(sizeof(node));//aloca tamanho do novo
     if(novo==NULL)
         return 0; //se retornar , náo tem mais espaço para alocar memória
     
-    novo->pes = pes; //jogando a pessoa que recebi pra dentro do novo;
+    novo->utente = utente; //jogando a pessoa que recebi pra dentro do novo;
     novo->prox = NULL;// pq sempre insere no fim, logo o fim nunca tera proximo;
     if(vazia(f)){
         f->inicio= novo;
@@ -35,12 +42,12 @@ int inserir(utente pes, fila *f){
     return 1;
 } 
 
-utente remover_inicio(fila *f){
+struct utente remover_inicio(fila *f){
     node * excluir = f->inicio; 
-    utente pes;
-    pes.id = 0; //se o id for zero, significa que nao foi removido ngm pq a fila ta vazia
+    struct utente utente;
+    utente.id = 0; //se o id for zero, significa que nao foi removido ngm pq a fila ta vazia
     if(!vazia(f)){
-        pes=f->inicio->pes; // pessoa vai receber a pessoa do inicio da fila
+        utente=f->inicio->utente; // pessoa vai receber a pessoa do inicio da fila
         f->inicio=f->inicio->prox; // inicio recebe o prox do inicio
         free(excluir); 
         f->quant_atual--;
@@ -48,7 +55,16 @@ utente remover_inicio(fila *f){
             f->fim=NULL;
     }
     
-    return pes;
+    return utente;
+}
+
+void imprimir_utente(char mensagem[], struct utente utente){
+    printf("%s - ID: %d \tPrioridade: %d \tchegada: %d t.atend: %d t.part: %d\n", 
+            mensagem,
+            utente.id, utente.prioridade, 
+            utente.fase.tempo_chegada,
+            utente.fase.tempo_atendimento,
+            utente.fase.tempo_partida);
 }
 
 void listar(fila *f){
@@ -59,10 +75,9 @@ void listar(fila *f){
 
     node * aux = f->inicio;
     while(aux!=NULL){ // se aux for null é que chegou no fim da fila e nao tem valor
-        printf("ID da pessoa: %d \t Prioridade: %d \t Minuto de chegada: %d \n", aux->pes.id, aux->pes.prioridade, aux->pes.fase.tempo_chegada);
+        imprimir_utente("", aux->utente);
         aux= aux->prox;
     }
-    
 }
 
 

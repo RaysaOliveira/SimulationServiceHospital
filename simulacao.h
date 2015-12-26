@@ -1,11 +1,12 @@
 #ifndef SIMULACAO_H
 #define	SIMULACAO_H
+#include "fila.h"
 
 #define TOTAL_SERVIDORES_FASE1 2
 #define TOTAL_SERVIDORES_FASE2 2
 #define TOTAL_SERVIDORES_FASE3 4
 #define TOTAL_SERVIDORES_FASE4 2
-
+#define TEMPO_MAX_ATENDIMENTO_FASE1 8
 /**
  * O lambda é 1/a media do tempo de chegada;
  */
@@ -16,16 +17,16 @@ double lambda;
  * de um servidor. O valor 0 indica que o servidor
  * está livre e maior que 0 indica o id do utente sendo atendido.
  */
-int servidores_fase1[TOTAL_SERVIDORES_FASE1];
-int servidores_fase2[TOTAL_SERVIDORES_FASE2];
+struct utente * servidores_fase1[TOTAL_SERVIDORES_FASE1];
+struct utente * servidores_fase2[TOTAL_SERVIDORES_FASE2];
 
 /** na fase 3, cada servidor é um médico
  */
-int servidores_fase3[TOTAL_SERVIDORES_FASE3];
-int servidores_fase4[TOTAL_SERVIDORES_FASE4];
+struct utente * servidores_fase3[TOTAL_SERVIDORES_FASE3];
+struct utente * servidores_fase4[TOTAL_SERVIDORES_FASE4];
 
 /**
- * Inicializa todos os vetores de servidores em cada posição com zero para indicar que todos 
+ * Inicializa todos os vetores de servidores em cada posição com NULL para indicar que todos 
  * os servidores estao livres;
  */
 void inicializar_servidores_todas_fases();
@@ -35,10 +36,10 @@ void inicializar_servidores_todas_fases();
  *
  * @param servidores o servidor que quero fazer a busca
  * @param tamanho_vetor_servidor o tamanho do vetor do servidor
- * @return o indice se encontrar servidor vazio ou 0 se nenhum servidor
- * estiver livre 
+ * @return a posição do primeiro servidor livre ou -1 se nenhum servidor
+ * estiver disponível 
  */
-int procurar_indice_servidor_livre(int servidores[], int tamanho_vetor_servidor);
+int procurar_indice_servidor_livre(struct utente *servidores[], int tamanho_vetor_servidor);
 
 
 /**
@@ -115,6 +116,12 @@ int gerar_exame();
  * 4 = exame de urina
  */
 int escolher_exame();
+
+/**
+ * 
+ * @return número aleatorio que representa o tempo de atendimento na fase 1. 
+ */
+int gerar_tempo_atendimento_fase1();
 
 
 #endif	/* SIMULACAO_H */

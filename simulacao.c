@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-static long seed = 491823749346L;
+static long seed = 9346L;
 
 void inicializar_parametros_simulacao(long seed1) {
     seed = seed1;
@@ -25,9 +25,9 @@ double poisson() {
     return -logf(1.0f - aleatorio) / lambda;
 }
 
-void inicializar_servidores_por_fase(int servidores[], int tamanho_vetor_servidor){
+void inicializar_servidores_por_fase(struct utente * servidores[], int tamanho_vetor_servidor){
     for(int i=0; i<tamanho_vetor_servidor; i++){
-        servidores[i]=0;
+        servidores[i]=NULL;
     }
 
 }
@@ -38,14 +38,14 @@ void inicializar_servidores_todas_fases(){
     inicializar_servidores_por_fase(servidores_fase4, TOTAL_SERVIDORES_FASE4);
 } 
 
-int procurar_indice_servidor_livre(int servidores[], int tamanho_vetor_servidor){
-
-    for(int i=0; i<tamanho_vetor_servidor;i++){
-        if(servidores[i]==0)
+int procurar_indice_servidor_livre(struct utente *servidores[], int tamanho_vetor_servidor){
+    for(int i=0; i<tamanho_vetor_servidor; i++){
+        if(servidores[i]==NULL)
             return i;
     }
-    return 0;
+    return -1;
 }
+
 int gerar_prioridade_fase2() {
     float aleatorio = ran0(&seed);
 
@@ -161,4 +161,16 @@ int escolher_exame() {
         return 2;
 
     return 3;
+}
+
+int gerar_tempo_atendimento_fase1(){
+    /*
+     * Foi multiplicado por 100, pelo fato da função retornar
+     * um valor float dentre 0.0 e 1.0, multiplicando por 100, será convertido
+     * em um numero inteiro com ate 3 digitos. Como o meu tempo maximo de atendimento é 8
+     * eu obtenho o resto dividido por ele, para limitar que ele é o maximo e somo 
+     * +1 pq o resultado do resto vai ser entre 0 e 7. 
+     */
+    int aleatorio = ran0(&seed) * 100;
+    return (aleatorio % TEMPO_MAX_ATENDIMENTO_FASE1) + 1;
 }
