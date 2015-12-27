@@ -2,17 +2,22 @@
 #define	SIMULACAO_H
 #include "fila.h"
 
-#define TOTAL_SERVIDORES_FASE1 2
-#define TOTAL_SERVIDORES_FASE2 2
-#define TOTAL_SERVIDORES_FASE3 4
-#define TOTAL_SERVIDORES_FASE4 2
-#define TEMPO_MAX_ATENDIMENTO_FASE1 8
-#define TOTAL_FILAS_FASE2 4
-
+/**
+ * Define o índice de cada vetor no vetor de fases do utente
+ */
 #define FASE1 0
 #define FASE2 1
 #define FASE3 2
 #define FASE4 3
+
+#define total_servidores_fase1 2
+#define total_servidores_fase2 2
+#define total_servidores_fase3 4
+#define total_servidores_fase4 2
+#define tempo_max_atendimento_fase1 8
+#define total_filas_fase1 1
+#define total_filas_fase2 4
+
 
 /**
  * O lambda é 1/a media do tempo de chegada;
@@ -24,34 +29,39 @@ double lambda;
  * de um servidor. O valor 0 indica que o servidor
  * está livre e maior que 0 indica o id do utente sendo atendido.
  */
-struct utente * servidores_fase1[TOTAL_SERVIDORES_FASE1];
-struct utente * servidores_fase2[TOTAL_SERVIDORES_FASE2];
+struct utente * servidores_fase1[total_servidores_fase1];
+struct utente * servidores_fase2[total_servidores_fase2];
 
 /** na fase 3, cada servidor é um médico
  */
-struct utente * servidores_fase3[TOTAL_SERVIDORES_FASE3];
-struct utente * servidores_fase4[TOTAL_SERVIDORES_FASE4];
+struct utente * servidores_fase3[total_servidores_fase3];
+struct utente * servidores_fase4[total_servidores_fase4];
 
 /**
- * Vetor fila da fase2 do tipo fila
+ * Vetores de filas para cada fase. Se um determinado vetor
+ * tiver mais de uma fila, indica que cada fila é para utentes
+ * de uma determinada prioridade. Se tiver uma fila só,
+ * todos os utentes vão para tal fila
  **/
-struct fila * filas_fase2[TOTAL_FILAS_FASE2];
+struct fila * filas_fase1[total_filas_fase1];
+struct fila * filas_fase2[total_filas_fase2];
+
+
 
 /**
  * Inicializa todos os vetores de servidores em cada posição com NULL para indicar que todos 
  * os servidores estao livres;
  */
-void inicializar_servidores_e_filas_todas_fases();
+void inicializar_servidores_todas_fases();
 
 /**
- * Procura o primeiro servidor livre e retorna o indice dele.
+ * Verifica se o servidor na posição indicada está livre
  *
- * @param servidores o servidor que quero fazer a busca
- * @param tamanho_vetor_servidor o tamanho do vetor do servidor
- * @return a posição do primeiro servidor livre ou -1 se nenhum servidor
- * estiver disponível 
+ * @param servidores o vetor de servidores que deseja verificar
+ * @param posicao_a_verificar posição do servidor a ser verificado
+ * @return 1 se o servidor estiver livre e 0 caso contrário 
  */
-int procurar_indice_servidor_livre(struct utente *servidores[], int tamanho_vetor_servidor);
+int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar);
 
 
 /**

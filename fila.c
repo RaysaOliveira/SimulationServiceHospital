@@ -10,11 +10,19 @@ int vazia(fila *f){
     else return 0;
 }
 
-void inicializar_fila(fila *f){
+fila * inicializar_fila(){
+    fila *f = malloc(sizeof(fila));
     f->inicio = NULL;
     f->fim = NULL;
     f->quant_atual = 0;
     f->total_utentes_chegados = 0;
+    return f;
+}
+
+void inicializar_vetor_filas(fila * filas[], int tamanho_vetor_filas){
+    for(int i=0; i<tamanho_vetor_filas; i++){
+        filas[i] = inicializar_fila();
+    }
 }
 
 void limpar_fila(fila *f){
@@ -23,6 +31,12 @@ void limpar_fila(fila *f){
         free(utente);
     }
 }    
+
+void limpar_vetor_filas(fila * filas[], int tamanho_vetor_filas){
+    for(int i=0; i<tamanho_vetor_filas; i++){
+        limpar_fila(filas[i]);
+    }
+}
 
 int inserir(struct utente * utente, fila *f){
     //printf("inserir: endereco do utente %x \t endereco para onde o utente aponta %x \n", &utente, utente);
@@ -94,5 +108,14 @@ int calcular_tempo_espera_na_fila_fase(struct fase fase){
 
 int calcular_tempo_partida_na_fila_fase(struct fase fase){
     return fase.tempo_inicio_atendimento + fase.duracao_atendimento;
+}
+
+struct utente * remover_utente_da_primeira_fila_com_clientes_em_espera(fila * filas[], int tamanho_vetor_filas){
+    for(int i=0; i<tamanho_vetor_filas; i++){
+        if(!vazia(filas[i])){
+            return remover_inicio(filas[i]);                 
+        }   
+    }
+    return NULL;
 }
 

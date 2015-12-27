@@ -31,23 +31,21 @@ void inicializar_vetores_de_ponteiros(void * servidores[], int tamanho_vetor_ser
     }
 
 }
-void inicializar_servidores_e_filas_todas_fases(){
+void inicializar_servidores_todas_fases(){
     /**
      * o tipo void **, quer dizer que é um vetor de ponteiro para qualquer coisa
      */
-    inicializar_vetores_de_ponteiros((void **) servidores_fase1, TOTAL_SERVIDORES_FASE1);
-    inicializar_vetores_de_ponteiros((void **)servidores_fase2, TOTAL_SERVIDORES_FASE2);
-    inicializar_vetores_de_ponteiros((void **)servidores_fase3, TOTAL_SERVIDORES_FASE3);
-    inicializar_vetores_de_ponteiros((void **)servidores_fase4, TOTAL_SERVIDORES_FASE4);
-    inicializar_vetores_de_ponteiros((void **)filas_fase2, TOTAL_FILAS_FASE2);
+    inicializar_vetores_de_ponteiros((void **)servidores_fase1, total_servidores_fase1);
+    inicializar_vetores_de_ponteiros((void **)servidores_fase2, total_servidores_fase2);
+    inicializar_vetores_de_ponteiros((void **)servidores_fase3, total_servidores_fase3);
+    inicializar_vetores_de_ponteiros((void **)servidores_fase4, total_servidores_fase4);
 } 
 
-int procurar_indice_servidor_livre(struct utente *servidores[], int tamanho_vetor_servidor){
-    for(int i=0; i<tamanho_vetor_servidor; i++){
-        if(servidores[i]==NULL)
-            return i;
-    }
-    return -1;
+int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar){
+    if(servidores[posicao_a_verificar]==NULL)
+        return 1;
+
+    return 0;
 }
 
 int gerar_prioridade_fase2() {
@@ -176,5 +174,5 @@ int gerar_tempo_atendimento_fase1(){
      * +1 pq o resultado do resto vai ser entre 0 e 7. 
      */
     int aleatorio = ran0(&seed) * 100;
-    return (aleatorio % TEMPO_MAX_ATENDIMENTO_FASE1) + 1;
+    return (aleatorio % tempo_max_atendimento_fase1) + 1;
 }

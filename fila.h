@@ -35,8 +35,21 @@ typedef struct fila{
 } fila;
 
 //funcoes da fila
-void inicializar_fila(fila *f);
+
+/**
+ * Aloca memória para uma nova fila e inicializa a mesma.
+ * @return a nova fila alocada
+ */
+fila * inicializar_fila();
+
+/**
+ * Inicializa um vetor de filas;
+ * @param filas
+ * @param tamanho_vetor_filas
+ */
+void inicializar_vetor_filas(fila * filas[], int tamanho_vetor_filas);
 void limpar_fila(fila *f);
+void limpar_vetor_filas(fila * filas[], int tamanho_vetor_filas);
 int vazia(fila * f);
 int inserir(struct utente *utente, fila * f); // a fila é ponteiro pq é unica
 
@@ -65,5 +78,13 @@ int calcular_tempo_espera_na_fila_fase(struct fase fase);
  */
 int calcular_tempo_partida_na_fila_fase(struct fase fase);
 
+
+/**
+ * Remove o primeiro utente que estiver na fila de espera respeitando a prioridade
+ * @param filas vetor de fila que pretende fazer as buscas
+ * @param tamanho_vetor_filas tamanho do vetor
+ * @return o utente removido ou NULL caso todas as filas estejam vazias. 
+ */
+struct utente * remover_utente_da_primeira_fila_com_clientes_em_espera(fila * filas[], int tamanho_vetor_filas);
 #endif	/* FILA_H */
 

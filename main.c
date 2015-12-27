@@ -16,18 +16,25 @@
 #include "simulacao.h"
 #include "random.h"
 
-void inserir_cliente_na_fila_fase1(fila *f, int minuto){
+void inserir_cliente_na_fila_fase1(fila *filas[], int minuto, int tamanho_vetor_filas){
     /*Se o minuto atual for menor que o valor 
     atual de poisson vai chegar um cliente. se não, nao chega cliente no momento.
     */
     if(minuto < poisson()) { 
         struct utente *utente = (struct utente *)malloc(sizeof(struct utente));
-        utente->id = f->total_utentes_chegados+1; 
-        utente->fase[FASE1].tempo_chegada=minuto;
         utente->fase[FASE1].prioridade = eh_prioritario();
+        /* Se só existir uma fila para a fase, todos os utentes
+         * serão adicionados nan fila 0, caso contrário,
+         * serão adicionados na fila de mesmo número de sua prioridade
+         */
+        int indice_fila = 0;
+        if(tamanho_vetor_filas > 1)
+            indice_fila = utente->fase[FASE1].prioridade;
+        utente->id = filas[indice_fila]->total_utentes_chegados+1; 
+        utente->fase[FASE1].tempo_chegada=minuto;
         utente->fase[FASE1].duracao_atendimento = 0;
         utente->fase[FASE1].tempo_partida = 0;
-        inserir(utente, f);
+        inserir(utente, filas[indice_fila]);
         //imprimir_utente("inserido   na fase 1", utente);
     }
 }
@@ -43,22 +50,24 @@ void inserir_utente_na_fila_fase2(struct utente * utente, int minuto_atual){
      * Vou inserir o usuario na fila de acordo com sua prioridade
      */
     
-    //inserir(utente, filas_fase2[prioridade]); 
+    inserir(utente, filas_fase2[prioridade]); 
     imprimir_utente("inserido   na fase 2", utente, FASE2);
 }
 
-void atender_utente_fase1(fila *f, int minuto) {
-    if(!vazia(f)){
-        int indice_servidor = procurar_indice_servidor_livre(servidores_fase1, TOTAL_SERVIDORES_FASE1);
-        if(indice_servidor >= 0){
+void atender_utente(fila *filas[], int minuto, int tamanho_vetor_filas) {
+    for(int i=0; i<tamanho_vetor_filas; i++){
+        if(servidor_esta_livre(servidores_fase1, i)){
             //printf("Servidor Livre: %d\n", indice_servidor);
-            struct utente* utente = remover_inicio(f);  
-            servidores_fase1[indice_servidor] = utente;
-            utente->fase[FASE1].tempo_inicio_atendimento= minuto;
-            utente->fase[FASE1].duracao_atendimento=gerar_tempo_atendimento_fase1();
-            //imprimir_utente("início atend. fase 1", utente, FASE1);
-        }
-        //else printf("Nenhum servidor livre\n"); 
+            struct utente* utente = 
+                remover_utente_da_primeira_fila_com_clientes_em_espera(filas, tamanho_vetor_filas); 
+            if(utente!=NULL){
+                servidores_fase1[i] = utente;
+                utente->fase[FASE1].tempo_inicio_atendimento= minuto;
+                utente->fase[FASE1].duracao_atendimento=gerar_tempo_atendimento_fase1();
+
+                //imprimir_utente("início atend. fase 1", utente, FASE1);
+             } //else printf("Nenhum servidor livre\n");
+        }    
     }    
 }
 
@@ -67,7 +76,7 @@ int chegou_momento_de_finalizar_atendimento_utente(int minuto_atual, struct fase
 }
 
 void finalizar_atendimento_utentes_fase1(int minuto_atual){
-   for(int i=0; i<TOTAL_SERVIDORES_FASE1; i++){
+   for(int i=0; i<total_servidores_fase1; i++){
         struct utente * utente = servidores_fase1[i];
         if(utente!=NULL){
             /*
@@ -95,13 +104,13 @@ int main(int argc, char** argv) {
     long seed = time(NULL);
     float intervalo_medio_entre_chegadas_utentes = 8.5;
     int minuto_atual, total_minutos = 80, total_clientes = 0;
-
-    struct utente utente;
-    fila f;
     
-    inicializar_fila(&f);
+    inicializar_vetor_filas(filas_fase1, total_filas_fase1);
+    inicializar_vetor_filas(filas_fase2, total_filas_fase2);
+    //@todo iniciar os vetores das fases 3 e 4 aqui
     
-    inicializar_servidores_e_filas_todas_fases();
+    
+    inicializar_servidores_todas_fases();
     inicializar_parametros_simulacao(seed);
     //Inicializa o gerador com a média desejada
     poisson_init(intervalo_medio_entre_chegadas_utentes);
@@ -116,17 +125,21 @@ int main(int argc, char** argv) {
     */
     
     for(minuto_atual = 1; minuto_atual <= total_minutos; minuto_atual++){
-        inserir_cliente_na_fila_fase1(&f,minuto_atual);
-        atender_utente_fase1(&f, minuto_atual);
+        inserir_cliente_na_fila_fase1(filas_fase1, minuto_atual, total_filas_fase1);
+        atender_utente(filas_fase1, minuto_atual, total_filas_fase1);
         finalizar_atendimento_utentes_fase1(minuto_atual); 
-      }
+    }
     
-    printf("Total de pessoas que chegaram: %d\n", f.total_utentes_chegados);
+    int total_pessoas=0;
+    for(int i=0;i<total_filas_fase1; i++){
+        total_pessoas += filas_fase1[i]->total_utentes_chegados;
+    }    
+    
+    printf("Total geral de pessoas que chegaram: %d\n", total_pessoas);
     printf("Pessoas na fila:\n");
     
-    
     //inicializa novamente para apagar todos os elementos da fila
-    limpar_fila(&f);
+    limpar_vetor_filas(filas_fase1, total_filas_fase1);
     return 0;
 }
 
