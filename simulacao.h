@@ -18,6 +18,22 @@
 #define total_filas_fase1 1
 #define total_filas_fase2 4
 
+/**
+ * Struct que contêm todos os dados para gerenciar os servidores e as 
+ * filas de utentes de uma determinada fase.
+ */
+struct fase{
+    int total_servidores;
+    int total_filas;
+    
+    /*Usar utente **servidores é o mesmo que usar utente *servidores[],
+     ou seja, a variável é um vetor de ponteiros para um utente.
+     No entanto, se for usado [] é preciso indicar o tamanho do vetor.
+     Usando * no lugar de [] estamos dizendo que o vetor não tem um tamanho
+     pre-definido*/
+    struct utente **servidores;
+    struct fila **filas;
+};
 
 /**
  * O lambda é 1/a media do tempo de chegada;

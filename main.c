@@ -16,36 +16,36 @@
 #include "simulacao.h"
 #include "random.h"
 
-void inserir_cliente_na_fila_fase1(fila *filas[], int minuto, int tamanho_vetor_filas){
+void inserir_cliente_na_fila_fase1(struct fila *filas[], int minuto, int tamanho_vetor_filas){
     /*Se o minuto atual for menor que o valor 
     atual de poisson vai chegar um cliente. se não, nao chega cliente no momento.
     */
     if(minuto < poisson()) { 
         struct utente *utente = (struct utente *)malloc(sizeof(struct utente));
-        utente->fase[FASE1].prioridade = eh_prioritario();
+        utente->status_fase[FASE1].prioridade = eh_prioritario();
         /* Se só existir uma fila para a fase, todos os utentes
          * serão adicionados nan fila 0, caso contrário,
          * serão adicionados na fila de mesmo número de sua prioridade
          */
         int indice_fila = 0;
         if(tamanho_vetor_filas > 1)
-            indice_fila = utente->fase[FASE1].prioridade;
+            indice_fila = utente->status_fase[FASE1].prioridade;
         utente->id = filas[indice_fila]->total_utentes_chegados+1; 
-        utente->fase[FASE1].tempo_chegada=minuto;
-        utente->fase[FASE1].duracao_atendimento = 0;
-        utente->fase[FASE1].tempo_partida = 0;
+        utente->status_fase[FASE1].tempo_chegada=minuto;
+        utente->status_fase[FASE1].duracao_atendimento = 0;
+        utente->status_fase[FASE1].tempo_partida = 0;
         inserir(utente, filas[indice_fila]);
         //imprimir_utente("inserido   na fase 1", utente);
     }
 }
 
 void inserir_utente_na_fila_fase2(struct utente * utente, int minuto_atual){
-    utente->fase[FASE2].tempo_chegada=minuto_atual;
-    utente->fase[FASE2].tempo_inicio_atendimento = 0;
-    utente->fase[FASE2].prioridade = gerar_prioridade_fase2();
-    utente->fase[FASE2].duracao_atendimento = 0;
-    utente->fase[FASE2].tempo_partida = 0;
-    int prioridade = utente->fase[FASE2].prioridade;
+    utente->status_fase[FASE2].tempo_chegada=minuto_atual;
+    utente->status_fase[FASE2].tempo_inicio_atendimento = 0;
+    utente->status_fase[FASE2].prioridade = gerar_prioridade_fase2();
+    utente->status_fase[FASE2].duracao_atendimento = 0;
+    utente->status_fase[FASE2].tempo_partida = 0;
+    int prioridade = utente->status_fase[FASE2].prioridade;
     /*
      * Vou inserir o usuario na fila de acordo com sua prioridade
      */
@@ -54,7 +54,7 @@ void inserir_utente_na_fila_fase2(struct utente * utente, int minuto_atual){
     imprimir_utente("inserido   na fase 2", utente, FASE2);
 }
 
-void atender_utente(fila *filas[], int minuto, int tamanho_vetor_filas) {
+void atender_utente(struct fila *filas[], int minuto, int tamanho_vetor_filas) {
     for(int i=0; i<tamanho_vetor_filas; i++){
         if(servidor_esta_livre(servidores_fase1, i)){
             //printf("Servidor Livre: %d\n", indice_servidor);
@@ -62,8 +62,8 @@ void atender_utente(fila *filas[], int minuto, int tamanho_vetor_filas) {
                 remover_utente_da_primeira_fila_com_clientes_em_espera(filas, tamanho_vetor_filas); 
             if(utente!=NULL){
                 servidores_fase1[i] = utente;
-                utente->fase[FASE1].tempo_inicio_atendimento= minuto;
-                utente->fase[FASE1].duracao_atendimento=gerar_tempo_atendimento_fase1();
+                utente->status_fase[FASE1].tempo_inicio_atendimento= minuto;
+                utente->status_fase[FASE1].duracao_atendimento=gerar_tempo_atendimento_fase1();
 
                 //imprimir_utente("início atend. fase 1", utente, FASE1);
              } //else printf("Nenhum servidor livre\n");
@@ -71,7 +71,7 @@ void atender_utente(fila *filas[], int minuto, int tamanho_vetor_filas) {
     }    
 }
 
-int chegou_momento_de_finalizar_atendimento_utente(int minuto_atual, struct fase fase){
+int chegou_momento_de_finalizar_atendimento_utente(int minuto_atual, struct status_fase fase){
     return minuto_atual >= fase.tempo_partida;
 }
 
@@ -85,9 +85,9 @@ void finalizar_atendimento_utentes_fase1(int minuto_atual){
              * do cliente deve ser finalizado nesta fase e redirecionado para
              * a proxima fase.
              */
-            int tempo_partida = calcular_tempo_partida_na_fila_fase(utente->fase[FASE1]);
-            if(chegou_momento_de_finalizar_atendimento_utente(minuto_atual, utente->fase[FASE1])){
-                utente->fase[FASE1].tempo_partida=tempo_partida;
+            int tempo_partida = calcular_tempo_partida_na_fila_fase(utente->status_fase[FASE1]);
+            if(chegou_momento_de_finalizar_atendimento_utente(minuto_atual, utente->status_fase[FASE1])){
+                utente->status_fase[FASE1].tempo_partida=tempo_partida;
                 servidores_fase1[i]=NULL;
                 inserir_utente_na_fila_fase2(utente, minuto_atual);
                 //imprimir_utente("finalizado na fase 1", utente, FASE1);

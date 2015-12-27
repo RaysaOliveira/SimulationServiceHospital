@@ -4,14 +4,14 @@
 #include <stdio.h>
 
 
-int vazia(fila *f){
+int vazia(struct fila *f){
     if(f->quant_atual==0)
         return 1;
     else return 0;
 }
 
-fila * inicializar_fila(){
-    fila *f = malloc(sizeof(fila));
+struct fila * inicializar_fila(){
+    struct fila *f = malloc(sizeof(struct fila));
     f->inicio = NULL;
     f->fim = NULL;
     f->quant_atual = 0;
@@ -19,26 +19,26 @@ fila * inicializar_fila(){
     return f;
 }
 
-void inicializar_vetor_filas(fila * filas[], int tamanho_vetor_filas){
+void inicializar_vetor_filas(struct fila * filas[], int tamanho_vetor_filas){
     for(int i=0; i<tamanho_vetor_filas; i++){
         filas[i] = inicializar_fila();
     }
 }
 
-void limpar_fila(fila *f){
+void limpar_fila(struct fila *f){
     while(!vazia(f)) {
         struct utente * utente = remover_inicio(f);
         free(utente);
     }
 }    
 
-void limpar_vetor_filas(fila * filas[], int tamanho_vetor_filas){
+void limpar_vetor_filas(struct fila * filas[], int tamanho_vetor_filas){
     for(int i=0; i<tamanho_vetor_filas; i++){
         limpar_fila(filas[i]);
     }
 }
 
-int inserir(struct utente * utente, fila *f){
+int inserir(struct utente * utente, struct fila *f){
     //printf("inserir: endereco do utente %x \t endereco para onde o utente aponta %x \n", &utente, utente);
     
     node *novo = (node *)malloc(sizeof(node));//aloca tamanho do novo
@@ -62,7 +62,7 @@ int inserir(struct utente * utente, fila *f){
     return 1;
 } 
 
-struct utente *remover_inicio(fila *f){
+struct utente *remover_inicio(struct fila *f){
     node * excluir = f->inicio; 
     struct utente *utente = NULL;
     if(!vazia(f)){
@@ -81,15 +81,15 @@ void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase){
     printf(
         "%s: id %3d Prior. %2d | chegada %3d inicio atend %3d dur. atend %3d part %3d espera %3d\n", 
         mensagem,
-        utente->id, utente->fase[indice_fase].prioridade, 
-        utente->fase[indice_fase].tempo_chegada,
-            utente->fase[indice_fase].tempo_inicio_atendimento,
-        utente->fase[indice_fase].duracao_atendimento,
-        utente->fase[indice_fase].tempo_partida,
-        calcular_tempo_espera_na_fila_fase(utente->fase[indice_fase]));
+        utente->id, utente->status_fase[indice_fase].prioridade, 
+        utente->status_fase[indice_fase].tempo_chegada,
+            utente->status_fase[indice_fase].tempo_inicio_atendimento,
+        utente->status_fase[indice_fase].duracao_atendimento,
+        utente->status_fase[indice_fase].tempo_partida,
+        calcular_tempo_espera_na_fila_fase(utente->status_fase[indice_fase]));
 }
 
-void listar(fila *f){
+void listar(struct fila *f){
     if(vazia(f)) {
         printf("Fila Vazia! \n");
         return;
@@ -102,15 +102,15 @@ void listar(fila *f){
     }
 }
 
-int calcular_tempo_espera_na_fila_fase(struct fase fase){
+int calcular_tempo_espera_na_fila_fase(struct status_fase fase){
     return fase.tempo_inicio_atendimento-fase.tempo_chegada; 
 }
 
-int calcular_tempo_partida_na_fila_fase(struct fase fase){
+int calcular_tempo_partida_na_fila_fase(struct status_fase fase){
     return fase.tempo_inicio_atendimento + fase.duracao_atendimento;
 }
 
-struct utente * remover_utente_da_primeira_fila_com_clientes_em_espera(fila * filas[], int tamanho_vetor_filas){
+struct utente * remover_utente_da_primeira_fila_com_clientes_em_espera(struct fila * filas[], int tamanho_vetor_filas){
     for(int i=0; i<tamanho_vetor_filas; i++){
         if(!vazia(filas[i])){
             return remover_inicio(filas[i]);                 
