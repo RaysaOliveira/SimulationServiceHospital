@@ -7,6 +7,13 @@
 #define TOTAL_SERVIDORES_FASE3 4
 #define TOTAL_SERVIDORES_FASE4 2
 #define TEMPO_MAX_ATENDIMENTO_FASE1 8
+#define TOTAL_FILAS_FASE2 4
+
+#define FASE1 0
+#define FASE2 1
+#define FASE3 2
+#define FASE4 3
+
 /**
  * O lambda é 1/a media do tempo de chegada;
  */
@@ -26,10 +33,15 @@ struct utente * servidores_fase3[TOTAL_SERVIDORES_FASE3];
 struct utente * servidores_fase4[TOTAL_SERVIDORES_FASE4];
 
 /**
+ * Vetor fila da fase2 do tipo fila
+ **/
+struct fila * filas_fase2[TOTAL_FILAS_FASE2];
+
+/**
  * Inicializa todos os vetores de servidores em cada posição com NULL para indicar que todos 
  * os servidores estao livres;
  */
-void inicializar_servidores_todas_fases();
+void inicializar_servidores_e_filas_todas_fases();
 
 /**
  * Procura o primeiro servidor livre e retorna o indice dele.
@@ -68,10 +80,10 @@ void inicializar_parametros_simulacao(long seed);
  * @param seed Semente a ser usada pelo random (é o valor inicial
  * da sequência de números aleatórios a ser gerada)
  * @return Retorna um valor inteiro entre 1 e 4 sendo:
- * 1 = vermelho
- * 2 = laranja
- * 3 = amarelo
- * 4 = verde
+ * 0 = vermelho
+ * 1 = laranja
+ * 2 = amarelo
+ * 3 = verde
  */
 int gerar_prioridade_fase2();
 

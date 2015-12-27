@@ -1,6 +1,8 @@
 #include "fila.h"
+#include "simulacao.h"
 #include <stdlib.h>
 #include <stdio.h>
+
 
 int vazia(fila *f){
     if(f->quant_atual==0)
@@ -16,11 +18,15 @@ void inicializar_fila(fila *f){
 }
 
 void limpar_fila(fila *f){
-    while(!vazia(f))
-        remover_inicio(f);
-}
+    while(!vazia(f)) {
+        struct utente * utente = remover_inicio(f);
+        free(utente);
+    }
+}    
 
-int inserir(struct utente utente, fila *f){
+int inserir(struct utente * utente, fila *f){
+    //printf("inserir: endereco do utente %x \t endereco para onde o utente aponta %x \n", &utente, utente);
+    
     node *novo = (node *)malloc(sizeof(node));//aloca tamanho do novo
     if(novo==NULL)
         return 0; //se retornar , náo tem mais espaço para alocar memória
@@ -42,12 +48,11 @@ int inserir(struct utente utente, fila *f){
     return 1;
 } 
 
-struct utente remover_inicio(fila *f){
+struct utente *remover_inicio(fila *f){
     node * excluir = f->inicio; 
-    struct utente utente;
-    utente.id = 0; //se o id for zero, significa que nao foi removido ngm pq a fila ta vazia
+    struct utente *utente = NULL;
     if(!vazia(f)){
-        utente=f->inicio->utente; // pessoa vai receber a pessoa do inicio da fila
+        utente=f->inicio->utente; // UTENTE vai receber O UTENTE do inicio da fila
         f->inicio=f->inicio->prox; // inicio recebe o prox do inicio
         free(excluir); 
         f->quant_atual--;
@@ -58,13 +63,16 @@ struct utente remover_inicio(fila *f){
     return utente;
 }
 
-void imprimir_utente(char mensagem[], struct utente utente){
-    printf("%s - ID: %d \tPrioridade: %d \tchegada: %d t.atend: %d t.part: %d\n", 
-            mensagem,
-            utente.id, utente.prioridade, 
-            utente.fase.tempo_chegada,
-            utente.fase.tempo_atendimento,
-            utente.fase.tempo_partida);
+void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase){
+    printf(
+        "%s: id %3d Prior. %2d | chegada %3d inicio atend %3d dur. atend %3d part %3d espera %3d\n", 
+        mensagem,
+        utente->id, utente->fase[indice_fase].prioridade, 
+        utente->fase[indice_fase].tempo_chegada,
+            utente->fase[indice_fase].tempo_inicio_atendimento,
+        utente->fase[indice_fase].duracao_atendimento,
+        utente->fase[indice_fase].tempo_partida,
+        calcular_tempo_espera_na_fila_fase(utente->fase[indice_fase]));
 }
 
 void listar(fila *f){
@@ -75,9 +83,16 @@ void listar(fila *f){
 
     node * aux = f->inicio;
     while(aux!=NULL){ // se aux for null é que chegou no fim da fila e nao tem valor
-        imprimir_utente("", aux->utente);
+        imprimir_utente("", aux->utente, FASE1);
         aux= aux->prox;
     }
 }
 
+int calcular_tempo_espera_na_fila_fase(struct fase fase){
+    return fase.tempo_inicio_atendimento-fase.tempo_chegada; 
+}
+
+int calcular_tempo_partida_na_fila_fase(struct fase fase){
+    return fase.tempo_inicio_atendimento + fase.duracao_atendimento;
+}
 

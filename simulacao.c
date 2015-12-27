@@ -25,17 +25,21 @@ double poisson() {
     return -logf(1.0f - aleatorio) / lambda;
 }
 
-void inicializar_servidores_por_fase(struct utente * servidores[], int tamanho_vetor_servidor){
+void inicializar_vetores_de_ponteiros(void * servidores[], int tamanho_vetor_servidor){
     for(int i=0; i<tamanho_vetor_servidor; i++){
         servidores[i]=NULL;
     }
 
 }
-void inicializar_servidores_todas_fases(){
-    inicializar_servidores_por_fase(servidores_fase1, TOTAL_SERVIDORES_FASE1);
-    inicializar_servidores_por_fase(servidores_fase2, TOTAL_SERVIDORES_FASE2);
-    inicializar_servidores_por_fase(servidores_fase3, TOTAL_SERVIDORES_FASE3);
-    inicializar_servidores_por_fase(servidores_fase4, TOTAL_SERVIDORES_FASE4);
+void inicializar_servidores_e_filas_todas_fases(){
+    /**
+     * o tipo void **, quer dizer que é um vetor de ponteiro para qualquer coisa
+     */
+    inicializar_vetores_de_ponteiros((void **) servidores_fase1, TOTAL_SERVIDORES_FASE1);
+    inicializar_vetores_de_ponteiros((void **)servidores_fase2, TOTAL_SERVIDORES_FASE2);
+    inicializar_vetores_de_ponteiros((void **)servidores_fase3, TOTAL_SERVIDORES_FASE3);
+    inicializar_vetores_de_ponteiros((void **)servidores_fase4, TOTAL_SERVIDORES_FASE4);
+    inicializar_vetores_de_ponteiros((void **)filas_fase2, TOTAL_FILAS_FASE2);
 } 
 
 int procurar_indice_servidor_livre(struct utente *servidores[], int tamanho_vetor_servidor){
@@ -53,20 +57,20 @@ int gerar_prioridade_fase2() {
      * @todo É preciso definir tais probabilidades por parâmetro de linha de comando
      * Exemplos de probabilidades. É preciso ordenar as prioridades para que 
      * o código funcione:
-     [0.0 .. 0.1] = prioridade 1
-     ]0.1 .. 0.3] = prioridade 4
-     ]0.3 .. 0.6] = prioridade 2
-     ]0.6 .. 1.0] = prioridade 3
+     [0.0 .. 0.1] = prioridade 0
+     ]0.1 .. 0.3] = prioridade 3
+     ]0.3 .. 0.6] = prioridade 1
+     ]0.6 .. 1.0] = prioridade 2
      */
 
     if (aleatorio <= 0.1)
-        return 1;
+        return 0;
     if (aleatorio <= 0.3)
-        return 4;
+        return 3;
     if (aleatorio <= 0.6)
-        return 2;
+        return 1;
 
-    return 3;
+    return 2;
 }
 
 int eh_prioritario() {
