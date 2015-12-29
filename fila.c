@@ -19,12 +19,6 @@ struct fila * inicializar_fila(){
     return f;
 }
 
-void inicializar_vetor_filas(struct fila * filas[], int tamanho_vetor_filas){
-    for(int i=0; i<tamanho_vetor_filas; i++){
-        filas[i] = inicializar_fila();
-    }
-}
-
 void limpar_fila(struct fila *f){
     while(!vazia(f)) {
         struct utente * utente = remover_inicio(f);

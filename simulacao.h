@@ -9,29 +9,51 @@
 #define FASE2 1
 #define FASE3 2
 #define FASE4 3
-
-#define total_servidores_fase1 2
-#define total_servidores_fase2 2
-#define total_servidores_fase3 4
-#define total_servidores_fase4 2
-#define tempo_max_atendimento_fase1 8
-#define total_filas_fase1 1
-#define total_filas_fase2 4
+#define TOTAL_FASES 4
 
 /**
  * Struct que contêm todos os dados para gerenciar os servidores e as 
  * filas de utentes de uma determinada fase.
  */
 struct fase{
+    /**
+     * O número da fase começa em 0 (FASE1) e vai até TOTAL_FASES-1
+     */
+    int numero_fase;
+    
+    /**
+     * Total de servidores da fase (total de elementos do vetor servidores)
+     */
     int total_servidores;
+    /**
+     * Total de filas da fase (total de elementos do vetor filas)
+     */
     int total_filas;
     
-    /*Usar utente **servidores é o mesmo que usar utente *servidores[],
-     ou seja, a variável é um vetor de ponteiros para um utente.
-     No entanto, se for usado [] é preciso indicar o tamanho do vetor.
-     Usando * no lugar de [] estamos dizendo que o vetor não tem um tamanho
-     pre-definido*/
+    /**
+     * Tempo máximo que o cliente vai levar para ser atendido na fase
+     */
+    int tempo_max_atendimento;
+    
+    /** Vetor de servidores da fase.
+     * Cada posição do vetor representa o estado
+     * de um servidor. O valor NULL indica que o servidor
+     * está livre, caso contrário indica o utente sendo atendido.
+     * 
+     * Usar utente **servidores é o mesmo que usar utente *servidores[],
+     * ou seja, a variável é um vetor de ponteiros para um utente.
+     * No entanto, se for usado [] é preciso indicar o tamanho do vetor.
+     * Usando * no lugar de [] estamos dizendo que o vetor não tem um tamanho
+     * pre-definido.
+     */
     struct utente **servidores;
+    
+    /**
+     * Vetor de filas da fase. Se um determinado vetor
+     * tiver mais de uma fila, indica que cada fila é para utentes
+     * de uma determinada prioridade. Se tiver uma fila só,
+     * todos os utentes vão para tal fila
+     **/
     struct fila **filas;
 };
 
@@ -40,35 +62,18 @@ struct fase{
  */
 double lambda;
 
-/** Vetor de servidores das fases.
- * Cada posição do vetor representa o estado
- * de um servidor. O valor 0 indica que o servidor
- * está livre e maior que 0 indica o id do utente sendo atendido.
- */
-struct utente * servidores_fase1[total_servidores_fase1];
-struct utente * servidores_fase2[total_servidores_fase2];
-
-/** na fase 3, cada servidor é um médico
- */
-struct utente * servidores_fase3[total_servidores_fase3];
-struct utente * servidores_fase4[total_servidores_fase4];
-
 /**
- * Vetores de filas para cada fase. Se um determinado vetor
- * tiver mais de uma fila, indica que cada fila é para utentes
- * de uma determinada prioridade. Se tiver uma fila só,
- * todos os utentes vão para tal fila
- **/
-struct fila * filas_fase1[total_filas_fase1];
-struct fila * filas_fase2[total_filas_fase2];
-
-
-
-/**
- * Inicializa todos os vetores de servidores em cada posição com NULL para indicar que todos 
- * os servidores estao livres;
+ * Inicializa todas as fases da simulação, o que inclui criar
+ * os vetores de servidores e de filas e inicializar cada servidor e cada fila
+ * destes vetores.
+ * 
+ * @param fases Vetor de fases a ser inicializado
+ * @param total_filas_fase Vetor contendo o total de filas em cada fase
+ * @param total_servidores_fase Vetor contendo o total de servidors em cada fase
  */
-void inicializar_servidores_todas_fases();
+void inicializar_fases(struct fase fases[TOTAL_FASES], 
+        int total_filas_fase[TOTAL_FASES], 
+        int total_servidores_fase[TOTAL_FASES]);
 
 /**
  * Verifica se o servidor na posição indicada está livre
@@ -84,7 +89,7 @@ int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar);
  * Inicializa o gerador
  * @param mean A média desejada para o gerador Poisson
  */
-void poisson_init(double mean);
+void inicializar_poisson(double mean);
 
 /**
  * Gera um número pseudo aleatório seguindo a distribuição de Poisson.
@@ -99,7 +104,7 @@ double poisson();
  * @param seed Semente a ser usada pelo random (é o valor inicial
  * da sequência de números aleatórios a ser gerada) 
  */
-void inicializar_parametros_simulacao(long seed);
+void inicializar_seed(long seed);
 
 /**
  * Gera uma prioridade aleatoriamente para um utente na fase 2.
@@ -156,10 +161,11 @@ int gerar_exame();
 int escolher_exame();
 
 /**
- * 
- * @return número aleatorio que representa o tempo de atendimento na fase 1. 
+ * Gera um tempo aleatório de atendimento para um utente em uma fase.
+ * @param fase Fase para qual deseja-se gerar um tempo de atendimento aleatório para um utente
+ * @return número aleatorio que representa o tempo de atendimento na fase. 
  */
-int gerar_tempo_atendimento_fase1();
+int gerar_tempo_atendimento_fase(struct fase *fase);
 
 
 #endif	/* SIMULACAO_H */

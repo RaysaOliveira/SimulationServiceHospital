@@ -7,16 +7,17 @@
 
 #include "simulacao.h"
 #include "random.h"
+#include "fila.h"
 #include <stdlib.h>
 #include <math.h>
 
 static long seed = 9346L;
 
-void inicializar_parametros_simulacao(long seed1) {
+void inicializar_seed(long seed1) {
     seed = seed1;
 }
 
-void poisson_init(double mean) {
+void inicializar_poisson(double mean) {
     lambda = 1 / mean;
 }
 
@@ -25,21 +26,37 @@ double poisson() {
     return -logf(1.0f - aleatorio) / lambda;
 }
 
-void inicializar_vetores_de_ponteiros(void * servidores[], int tamanho_vetor_servidor){
-    for(int i=0; i<tamanho_vetor_servidor; i++){
-        servidores[i]=NULL;
+void inicializar_servidores_fase(struct fase *fase){
+    //cria o vetor de servidores com o total de servidores indicados na fase
+    fase->servidores = malloc(sizeof(struct utente *) * fase->total_servidores);
+    for(int i=0; i<fase->total_servidores; i++){
+        //inicializa cada servidor com null para indicar que todos estão livres
+        fase->servidores[i]=NULL;
     }
-
 }
-void inicializar_servidores_todas_fases(){
-    /**
-     * o tipo void **, quer dizer que é um vetor de ponteiro para qualquer coisa
-     */
-    inicializar_vetores_de_ponteiros((void **)servidores_fase1, total_servidores_fase1);
-    inicializar_vetores_de_ponteiros((void **)servidores_fase2, total_servidores_fase2);
-    inicializar_vetores_de_ponteiros((void **)servidores_fase3, total_servidores_fase3);
-    inicializar_vetores_de_ponteiros((void **)servidores_fase4, total_servidores_fase4);
-} 
+
+void inicializar_filas_fase(struct fase *fase){
+    //cria o vetor de filas com o total de filas indicados na fase
+    fase->filas = malloc(sizeof(struct fila *) * fase->total_filas);
+    for(int i = 0; i < fase->total_filas; i++){
+        //inicializa cada fila
+        fase->filas[i] = inicializar_fila();
+    }
+}
+
+void inicializar_fases(struct fase fases[TOTAL_FASES], 
+        int total_filas_fase[TOTAL_FASES], 
+        int total_servidores_fase[TOTAL_FASES]){
+    
+    for(int i = 0; i < TOTAL_FASES; i++){
+        fases[i].numero_fase = i;
+        fases[i].total_filas = total_filas_fase[i];
+        fases[i].total_servidores = total_servidores_fase[i];
+        
+        inicializar_servidores_fase(&fases[i]);        
+        inicializar_filas_fase(&fases[i]);
+    }
+}
 
 int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar){
     if(servidores[posicao_a_verificar]==NULL)
@@ -165,14 +182,17 @@ int escolher_exame() {
     return 3;
 }
 
-int gerar_tempo_atendimento_fase1(){
+int gerar_tempo_atendimento_fase(struct fase *fase){
     /*
      * Foi multiplicado por 100, pelo fato da função retornar
      * um valor float dentre 0.0 e 1.0, multiplicando por 100, será convertido
-     * em um numero inteiro com ate 3 digitos. Como o meu tempo maximo de atendimento é 8
-     * eu obtenho o resto dividido por ele, para limitar que ele é o maximo e somo 
-     * +1 pq o resultado do resto vai ser entre 0 e 7. 
+     * em um numero inteiro com ate 3 digitos. Como o meu tempo maximo de atendimento é 
+     * definido pelo campo tempo_max_atendimento na fase,
+     * obtem-se o resto dividido por tal valor para garantir
+     * que o valor aleatório máximo será o definido em tal variável. 
+     * Soma-se +1 pq o resultado do resto vai ser entre 0 e tempo_max_atendimento-1,
+     * mas deseja-se entre 1 e tempo_max_atendimento.
      */
     int aleatorio = ran0(&seed) * 100;
-    return (aleatorio % tempo_max_atendimento_fase1) + 1;
+    return (aleatorio % fase->tempo_max_atendimento) + 1;
 }

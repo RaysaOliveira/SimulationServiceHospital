@@ -41,12 +41,6 @@ struct fila{
  */
 struct fila * inicializar_fila();
 
-/**
- * Inicializa um vetor de filas;
- * @param filas
- * @param tamanho_vetor_filas
- */
-void inicializar_vetor_filas(struct fila * filas[], int tamanho_vetor_filas);
 void limpar_fila(struct fila *f);
 void limpar_vetor_filas(struct fila * filas[], int tamanho_vetor_filas);
 int vazia(struct fila * f);
