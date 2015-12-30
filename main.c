@@ -64,16 +64,16 @@ void atender_utente(struct fase *fase, int minuto) {
             //printf("servidor %d está livre no minuto %d\n", i, minuto);
             //printf("Servidor Livre: %d\n", indice_servidor);
             struct utente* utente = 
-                remover_utente_da_primeira_fila_com_utentes_em_espera(fase); 
+                pesquisar_todas_as_filas_e_remover_utente_maior_prioridade(fase); 
             //se algum cliente foi chamdo da fila para iniciar atendimento pelo servidor
             if(utente!=NULL){
                 //atribui o utente ao servidor para indicar que o servidor agora está ocupado
                 fase->servidores[i] = utente;
-                //printf("utente %d sendo atendido por servidor %d no minuto %d\n", utente->id, i, minuto);
+               // printf("utente %d sendo atendido por servidor %d no minuto %d\n", utente->id, i, minuto);
                 utente->status_fase[fase->numero_fase].tempo_inicio_atendimento = minuto;
-                utente->status_fase[fase->numero_fase].duracao_atendimento=gerar_tempo_atendimento_fase(fase);
+                utente->status_fase[fase->numero_fase].duracao_atendimento=gerar_duracao_atendimento(fase);
 
-                imprimir_utente("início atend.", utente, FASE1);
+                imprimir_utente("início atend.", utente, fase->numero_fase);
              } //else printf("Nehum utente restante na fila no minuto %d\n", minuto);
         }    
     }    
@@ -87,10 +87,18 @@ void atender_utente(struct fase *fase, int minuto) {
  * caso contrário retorna 0 (false)
  */
 int chegou_momento_de_finalizar_atendimento_utente(int minuto_atual, struct status_fase status_fase){
-    return minuto_atual >= calcular_tempo_partida_na_fila_fase(status_fase);
+    return minuto_atual >= calcular_tempo_partida_do_utente_na_fila(status_fase);
 }
 
-void finalizar_atendimento_utentes_fase(struct fase *fase_atual, struct fase *fase_seguinte, int minuto_atual){
+/**
+ * Procura utentes que já chegaram no momento de finalizar o atendimento e move
+ * eles para a próxima fase
+ * @param fase_atual Fase atual que deseja-se verificar se há utentes que deve-se finalizar atendimento
+ * @param fase_seguinte Fase para a qual os utentes finalizados devem ser redirecionados. Se for igual a NULL,
+ * faz o utente sair do sistema pois não há uma próxima fase.
+ * @param minuto_atual Minuto atual do clock da simulação.
+ */
+void finalizar_atendimento_utentes(struct fase *fase_atual, struct fase *fase_seguinte, int minuto_atual){
    for(int i=0; i<fase_atual->total_servidores; i++){
         struct utente * utente = fase_atual->servidores[i];
         //verifica se o servidor está atendendo algum utente
@@ -101,23 +109,38 @@ void finalizar_atendimento_utentes_fase(struct fase *fase_atual, struct fase *fa
              * do cliente deve ser finalizado nesta fase e redirecionado para
              * a proxima fase.
              */
-            int tempo_partida = calcular_tempo_partida_na_fila_fase(utente->status_fase[fase_atual->numero_fase]);
-            if(chegou_momento_de_finalizar_atendimento_utente(minuto_atual, utente->status_fase[fase_atual->numero_fase])){
+            struct status_fase fase_utente = utente->status_fase[fase_atual->numero_fase];
+            if(chegou_momento_de_finalizar_atendimento_utente(minuto_atual, fase_utente)){
+                int tempo_partida = calcular_tempo_partida_do_utente_na_fila(fase_utente);
                 utente->status_fase[fase_atual->numero_fase].tempo_partida=tempo_partida;
+                //indica que o servidor agora está livre pois o utente terminou de ser atendido
                 fase_atual->servidores[i]=NULL;
                 imprimir_utente("finalizado   ", utente, fase_atual->numero_fase);
-                redirecionar_utente_para_fase_seguinte(fase_seguinte, utente, minuto_atual);
+                //Só redireciona se há uma próxima fase
+                if(fase_seguinte!=NULL)
+                    redirecionar_utente_para_fase_seguinte(fase_seguinte, utente, minuto_atual);
             }
-
         }
     } 
 }
 
+void chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(struct fase fases[TOTAL_FASES], int minuto_atual){
+    for(int num_fase=0; num_fase < TOTAL_FASES; num_fase++){
+            atender_utente(&fases[num_fase], minuto_atual);
+            /*Se chegou na última fase, chama a função finalizar_atendimento_utentes
+             * passando NULL para o parâmetro fase_seguinte
+             * para indicar que o utente não tem mais para onde ser redirecionado. */
+            if(num_fase == TOTAL_FASES-1)
+                finalizar_atendimento_utentes(&fases[num_fase], NULL, minuto_atual); 
+            else finalizar_atendimento_utentes(&fases[num_fase], &fases[num_fase+1], minuto_atual); 
+        }
+
+}
 int main(int argc, char** argv) {
     /*Parâmetros da simulação*/
     int total_servidores_fases[TOTAL_FASES] = {2, 2, 4, 2};
     int total_filas_fases[TOTAL_FASES] = {1, 4, 4, 4};
-    int tempo_max_atendimento_fases[TOTAL_FASES]={10, 20, 40, 50};
+    int tempo_max_atendimento_fases[TOTAL_FASES]={8, 15, 40, 50};
     double intervalo_medio_entre_chegadas_utentes = 8.5;
     int total_minutos_simulacao = 80;
 
@@ -144,15 +167,19 @@ int main(int argc, char** argv) {
     */
     
     for(minuto_atual = 1; minuto_atual <= total_minutos_simulacao; minuto_atual++){
-        inserir_utente_na_fila_fase1(&fases[FASE1], minuto_atual);
-        atender_utente(&fases[FASE1], minuto_atual);
-        //printf("main: utente %d sendo atendido por servidor %d no minuto %d\n\n", fases[FASE1].servidores[0]->id , 0, minuto_atual);
-        finalizar_atendimento_utentes_fase(&fases[FASE1], &fases[FASE2], minuto_atual); 
+        inserir_utente_na_fila_fase1(&fases[0], minuto_atual);
+        chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(fases, minuto_atual);
+    }   
+    printf("\nRecepção de novos utentes encerrada no minuto %d. Somente os utentes atuais serão atendidos\n\n", minuto_atual);
+    
+    while(total_utentes_atualmente_em_todas_fases(fases) > 0){
+        chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(fases, ++minuto_atual);
     }
+    printf("\nFinalização do atendimento de todos os utentes no minuto %d\n\n", minuto_atual);
     
     int total_pessoas=0;
-    for(int i=0;i<fases[FASE1].total_filas; i++){
-        total_pessoas += fases[FASE1].filas[i]->total_utentes_chegados;
+    for(int i=0;i<fases[0].total_filas; i++){
+        total_pessoas += fases[0].filas[i]->total_utentes_chegados;
     }    
     
     printf("Total geral de pessoas que chegaram: %d\n", total_pessoas);

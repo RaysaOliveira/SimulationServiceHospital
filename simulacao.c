@@ -170,7 +170,7 @@ int escolher_exame() {
     return 3;
 }
 
-int gerar_tempo_atendimento_fase(struct fase *fase){
+int gerar_duracao_atendimento(struct fase *fase){
     int tempo_minimo_atendimento = 5;
     /*
      * Foi multiplicado por 100, pelo fato da função retornar
@@ -192,4 +192,20 @@ int gerar_tempo_atendimento_fase(struct fase *fase){
     int resto = (aleatorio % (fase->tempo_max_atendimento - tempo_minimo_atendimento));
     
     return resto + tempo_minimo_atendimento;
+}
+
+int total_utentes_atualmente_na_fase(struct fase fase){
+    int total_utentes=0;
+    for(int i=0; i< fase.total_filas; i++){
+        total_utentes += fase.filas[i]->quant_atual;
+    }
+    return total_utentes;
+}
+
+int total_utentes_atualmente_em_todas_fases(struct fase fases[TOTAL_FASES]){
+    int total_utentes=0;
+    for(int i=0; i<TOTAL_FASES; i++){
+        total_utentes += total_utentes_atualmente_na_fase(fases[i]);
+    }
+    return total_utentes;
 }

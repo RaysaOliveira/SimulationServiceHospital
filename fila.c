@@ -120,11 +120,11 @@ int calcular_tempo_espera_na_fila_fase(struct status_fase status_fase){
     return status_fase.tempo_inicio_atendimento-status_fase.tempo_chegada; 
 }
 
-int calcular_tempo_partida_na_fila_fase(struct status_fase status_fase){
+int calcular_tempo_partida_do_utente_na_fila(struct status_fase status_fase){
     return status_fase.tempo_inicio_atendimento + status_fase.duracao_atendimento;
 }
 
-struct utente * remover_utente_da_primeira_fila_com_utentes_em_espera(struct fase * fase){
+struct utente * pesquisar_todas_as_filas_e_remover_utente_maior_prioridade(struct fase * fase){
     for(int i=0; i < fase->total_filas; i++){
         if(!vazia(fase->filas[i])){
             return remover_inicio(fase->filas[i]);                 

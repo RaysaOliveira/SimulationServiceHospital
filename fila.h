@@ -46,7 +46,7 @@ int calcular_tempo_espera_na_fila_fase(struct status_fase fase);
  * @param fase fase para qual deseja calcular o tempo de partida
  * @return o tempo de partida do utente na fila da fase indicada.
  */
-int calcular_tempo_partida_na_fila_fase(struct status_fase fase);
+int calcular_tempo_partida_do_utente_na_fila(struct status_fase fase);
 
 
 /**
@@ -54,6 +54,6 @@ int calcular_tempo_partida_na_fila_fase(struct status_fase fase);
  * @param fase fase de onde será removido um cliente de alguma das filas existentes
  * @return o utente removido ou NULL caso todas as filas estejam vazias. 
  */
-struct utente * remover_utente_da_primeira_fila_com_utentes_em_espera(struct fase * fase);
+struct utente * pesquisar_todas_as_filas_e_remover_utente_maior_prioridade(struct fase * fase);
 #endif	/* FILA_H */
 

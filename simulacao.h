@@ -2,13 +2,6 @@
 #define	SIMULACAO_H
 #include "tipos.h"
 
-/**
- * Define o índice de cada vetor no vetor de fases do utente
- */
-#define FASE1 0
-#define FASE2 1
-#define FASE3 2
-#define FASE4 3
 #define TOTAL_FASES 4
 
 
@@ -115,7 +108,10 @@ int escolher_exame();
  * @param fase Fase para qual deseja-se gerar um tempo de atendimento aleatório para um utente
  * @return número aleatorio que representa o tempo de atendimento na fase. 
  */
-int gerar_tempo_atendimento_fase(struct fase *fase);
+int gerar_duracao_atendimento(struct fase *fase);
+
+int total_utentes_atualmente_na_fase(struct fase fase);
+int total_utentes_atualmente_em_todas_fases(struct fase fases[TOTAL_FASES]);
 
 
 #endif	/* SIMULACAO_H */
