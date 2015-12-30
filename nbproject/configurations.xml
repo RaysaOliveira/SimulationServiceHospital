@@ -7,6 +7,7 @@
       <itemPath>fila.h</itemPath>
       <itemPath>random.h</itemPath>
       <itemPath>simulacao.h</itemPath>
+      <itemPath>tipos.h</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Arquivos de Código-Fonte"
@@ -56,6 +57,8 @@
       </item>
       <item path="simulacao.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="tipos.h" ex="false" tool="3" flavor2="0">
+      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
@@ -90,6 +93,8 @@
       <item path="simulacao.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="simulacao.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tipos.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

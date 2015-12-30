@@ -2,36 +2,13 @@
  * File:   fila.h
  * Author: raysaoliveira
  *
- * Created on 15 de Dezembro de 2015, 19:18
+ * Implementa funções para manipulação de filas encadeadas
  */
+#include "tipos.h"
 
 #ifndef FILA_H
 #define	FILA_H
 
-struct status_fase{
-    int tempo_chegada;
-    int tempo_inicio_atendimento;
-    int duracao_atendimento;
-    int tempo_partida;
-    int prioridade;
-};
-
-struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
-    int id;
-    struct status_fase status_fase[4];
-};
-
-typedef struct node{//no node tem pessoa e prox
-    struct utente *utente;
-    struct node * prox; //ponteiro pro proximo node;
-} node;
-
-struct fila{
-    node * inicio;
-    node * fim;
-    int quant_atual;
-    int total_utentes_chegados;
-};
 
 //funcoes da fila
 
@@ -73,11 +50,10 @@ int calcular_tempo_partida_na_fila_fase(struct status_fase fase);
 
 
 /**
- * Remove o primeiro utente que estiver na fila de espera respeitando a prioridade
- * @param filas vetor de fila que pretende fazer as buscas
- * @param tamanho_vetor_filas tamanho do vetor
+ * Remove o primeiro utente que estiver na fila de espera, respeitando a prioridade
+ * @param fase fase de onde será removido um cliente de alguma das filas existentes
  * @return o utente removido ou NULL caso todas as filas estejam vazias. 
  */
-struct utente * remover_utente_da_primeira_fila_com_clientes_em_espera(struct fila * filas[], int tamanho_vetor_filas);
+struct utente * remover_utente_da_primeira_fila_com_utentes_em_espera(struct fase * fase);
 #endif	/* FILA_H */
 

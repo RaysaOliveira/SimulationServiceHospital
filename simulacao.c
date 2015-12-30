@@ -7,6 +7,7 @@
 
 #include "simulacao.h"
 #include "random.h"
+#include "tipos.h"
 #include "fila.h"
 #include <stdlib.h>
 #include <math.h>
@@ -18,7 +19,7 @@ void inicializar_seed(long seed1) {
 }
 
 void inicializar_poisson(double mean) {
-    lambda = 1 / mean;
+    lambda = 1.0/mean;
 }
 
 double poisson() {
@@ -46,12 +47,14 @@ void inicializar_filas_fase(struct fase *fase){
 
 void inicializar_fases(struct fase fases[TOTAL_FASES], 
         int total_filas_fase[TOTAL_FASES], 
-        int total_servidores_fase[TOTAL_FASES]){
+        int total_servidores_fase[TOTAL_FASES],
+        int tempo_max_atendimento_fases[TOTAL_FASES]){
     
     for(int i = 0; i < TOTAL_FASES; i++){
         fases[i].numero_fase = i;
         fases[i].total_filas = total_filas_fase[i];
         fases[i].total_servidores = total_servidores_fase[i];
+        fases[i].tempo_max_atendimento= tempo_max_atendimento_fases[i];
         
         inicializar_servidores_fase(&fases[i]);        
         inicializar_filas_fase(&fases[i]);
@@ -65,7 +68,7 @@ int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar){
     return 0;
 }
 
-int gerar_prioridade_fase2() {
+int gerar_prioridade() {
     float aleatorio = ran0(&seed);
 
     /*
@@ -86,21 +89,6 @@ int gerar_prioridade_fase2() {
         return 1;
 
     return 2;
-}
-
-int eh_prioritario() {
-    float aleatorio = ran0(&seed);
-
-    /*@todo
-     * As probabilidades serao definidas e passadas por paramentro para a função;
-     * Aqui vou utilizar estas probabilidades:
-     * [0.0...0,7] - geral
-     * ]0.7...1.0] - prioritario
-     */
-    if (aleatorio > 0.7) {
-        return 0;
-    }
-    return 1;
 }
 
 int gerar_atendimento(int *total_atendimento) {
@@ -183,6 +171,7 @@ int escolher_exame() {
 }
 
 int gerar_tempo_atendimento_fase(struct fase *fase){
+    int tempo_minimo_atendimento = 5;
     /*
      * Foi multiplicado por 100, pelo fato da função retornar
      * um valor float dentre 0.0 e 1.0, multiplicando por 100, será convertido
@@ -190,9 +179,17 @@ int gerar_tempo_atendimento_fase(struct fase *fase){
      * definido pelo campo tempo_max_atendimento na fase,
      * obtem-se o resto dividido por tal valor para garantir
      * que o valor aleatório máximo será o definido em tal variável. 
-     * Soma-se +1 pq o resultado do resto vai ser entre 0 e tempo_max_atendimento-1,
-     * mas deseja-se entre 1 e tempo_max_atendimento.
+     * Como o resultado do resto vai ser entre 0 e tempo_max_atendimento-1,
+     * mas deseja-se entre tempo_minimo_atendimento e tempo_max_atendimento,
+     * soma-se tempo_minimo_atendimento ao resto.
+     * Porém, inicialmente tinhamos valores entre 0 e tempo_max_atendimento-1,
+     * agora teremos entre 1 e tempo_max_atendimento+tempo_minimo_atendimento,
+     * ou seja, o valor máximo será maior que o tempo máximo definido.
+     * Para evitar isso subtraiu-se o tempo_minimo_atendimento do tempo_max_atendimento
+     * no momento de calcular o resto. 
      */
     int aleatorio = ran0(&seed) * 100;
-    return (aleatorio % fase->tempo_max_atendimento) + 1;
+    int resto = (aleatorio % (fase->tempo_max_atendimento - tempo_minimo_atendimento));
+    
+    return resto + tempo_minimo_atendimento;
 }

@@ -1,5 +1,5 @@
 #include "fila.h"
-#include "simulacao.h"
+#include "tipos.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -72,15 +72,35 @@ struct utente *remover_inicio(struct fila *f){
 }
 
 void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase){
-    printf(
-        "%s: id %3d Prior. %2d | chegada %3d inicio atend %3d dur. atend %3d part %3d espera %3d\n", 
-        mensagem,
-        utente->id, utente->status_fase[indice_fase].prioridade, 
-        utente->status_fase[indice_fase].tempo_chegada,
-            utente->status_fase[indice_fase].tempo_inicio_atendimento,
-        utente->status_fase[indice_fase].duracao_atendimento,
-        utente->status_fase[indice_fase].tempo_partida,
-        calcular_tempo_espera_na_fila_fase(utente->status_fase[indice_fase]));
+    char mensagem1[200];
+    sprintf(mensagem1, "%s fase %d", mensagem, indice_fase);
+    
+    printf("%s: id %3d ", mensagem1, utente->id);
+    if(utente->prioridade >= 0)
+         printf("Prior %2d | ", utente->prioridade);
+    else printf("      %2s | ", "-");
+    
+    printf("chegada %3d ", utente->status_fase[indice_fase].tempo_chegada);
+    int inicio = utente->status_fase[indice_fase].tempo_inicio_atendimento;
+    if(inicio > 0)
+         printf("inicio atend %3d ", inicio);
+    else printf("             %3s ", "-");
+    
+    int duracao = utente->status_fase[indice_fase].duracao_atendimento;
+    if(duracao > 0)
+         printf("dur. atend %3d ", duracao);
+    else printf("           %3s ", "-");
+    
+    int partida = utente->status_fase[indice_fase].tempo_partida;
+    if(partida > 0)
+         printf("part %3d ", partida);
+    else printf("     %3s ", "-");
+    
+    int espera = calcular_tempo_espera_na_fila_fase(utente->status_fase[indice_fase]);
+    if(espera >= 0)
+         printf("espera %3d\n", espera);
+    else printf("       %3s\n", "-");
+    
 }
 
 void listar(struct fila *f){
@@ -91,23 +111,23 @@ void listar(struct fila *f){
 
     node * aux = f->inicio;
     while(aux!=NULL){ // se aux for null é que chegou no fim da fila e nao tem valor
-        imprimir_utente("", aux->utente, FASE1);
+        imprimir_utente("", aux->utente, 0);
         aux= aux->prox;
     }
 }
 
-int calcular_tempo_espera_na_fila_fase(struct status_fase fase){
-    return fase.tempo_inicio_atendimento-fase.tempo_chegada; 
+int calcular_tempo_espera_na_fila_fase(struct status_fase status_fase){
+    return status_fase.tempo_inicio_atendimento-status_fase.tempo_chegada; 
 }
 
-int calcular_tempo_partida_na_fila_fase(struct status_fase fase){
-    return fase.tempo_inicio_atendimento + fase.duracao_atendimento;
+int calcular_tempo_partida_na_fila_fase(struct status_fase status_fase){
+    return status_fase.tempo_inicio_atendimento + status_fase.duracao_atendimento;
 }
 
-struct utente * remover_utente_da_primeira_fila_com_clientes_em_espera(struct fila * filas[], int tamanho_vetor_filas){
-    for(int i=0; i<tamanho_vetor_filas; i++){
-        if(!vazia(filas[i])){
-            return remover_inicio(filas[i]);                 
+struct utente * remover_utente_da_primeira_fila_com_utentes_em_espera(struct fase * fase){
+    for(int i=0; i < fase->total_filas; i++){
+        if(!vazia(fase->filas[i])){
+            return remover_inicio(fase->filas[i]);                 
         }   
     }
     return NULL;
