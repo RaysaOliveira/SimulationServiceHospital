@@ -2,7 +2,6 @@
 #define	SIMULACAO_H
 #include "tipos.h"
 
-#define TOTAL_FASES 4
 
 
 /**
@@ -110,9 +109,10 @@ int escolher_exame();
  */
 int gerar_duracao_atendimento(struct fase *fase);
 
-int total_utentes_atualmente_na_fase(struct fase fase);
-int total_utentes_atualmente_em_todas_fases(struct fase fases[TOTAL_FASES]);
-
+int total_utentes_atualmente_em_fila(struct fase fase);
+int total_utentes_atualmente_em_fila_em_todas_as_fases(struct fase fases[TOTAL_FASES]);
+int total_utentes_em_atendimento(struct fase fase);
+int total_utentes_em_atendimento_em_todas_fases(struct fase fases[TOTAL_FASES]);
 
 #endif	/* SIMULACAO_H */
 

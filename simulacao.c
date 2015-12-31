@@ -194,7 +194,7 @@ int gerar_duracao_atendimento(struct fase *fase){
     return resto + tempo_minimo_atendimento;
 }
 
-int total_utentes_atualmente_na_fase(struct fase fase){
+int total_utentes_atualmente_em_fila(struct fase fase){
     int total_utentes=0;
     for(int i=0; i< fase.total_filas; i++){
         total_utentes += fase.filas[i]->quant_atual;
@@ -202,10 +202,27 @@ int total_utentes_atualmente_na_fase(struct fase fase){
     return total_utentes;
 }
 
-int total_utentes_atualmente_em_todas_fases(struct fase fases[TOTAL_FASES]){
+int total_utentes_atualmente_em_fila_em_todas_as_fases(struct fase fases[TOTAL_FASES]){
     int total_utentes=0;
     for(int i=0; i<TOTAL_FASES; i++){
-        total_utentes += total_utentes_atualmente_na_fase(fases[i]);
+        total_utentes += total_utentes_atualmente_em_fila(fases[i]);
+    }
+    return total_utentes;
+}
+
+int total_utentes_em_atendimento(struct fase fase){
+    int total_utentes=0;
+    for(int i=0; i< fase.total_servidores; i++){
+        if(fase.servidores[i]!=NULL)
+            total_utentes++;       
+    }
+    return total_utentes;
+}
+
+int total_utentes_em_atendimento_em_todas_fases(struct fase fases[TOTAL_FASES]){
+    int total_utentes=0;
+    for(int i=0; i<TOTAL_FASES; i++){
+        total_utentes +=total_utentes_em_atendimento(fases[i]);
     }
     return total_utentes;
 }

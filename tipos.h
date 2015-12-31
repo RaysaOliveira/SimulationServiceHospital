@@ -8,6 +8,8 @@
 #ifndef TIPOS_H
 #define	TIPOS_H
 
+#define TOTAL_FASES 4
+
 struct status_fase{
     int tempo_chegada;
     int tempo_inicio_atendimento;
@@ -17,8 +19,22 @@ struct status_fase{
 
 struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
     int id;
-    struct status_fase status_fase[4];
+    struct status_fase status_fase[TOTAL_FASES];
     int prioridade;  
+    
+    /**
+     * vetor para controlar os retornos aos medicos. O tamanho max dele é 
+     * a quantidade maxima de medicos que o utente pode consultar.
+     * 0 indica que o utente nao retornou no medico da posicao indicada e
+     * um que já retornou. 
+     */
+    int * retorno_medicos;
+    
+    /**
+     * vetor para controlar o total de exames solicitados por cada médico. O tamanho max dele é 
+     * a quantidade maxima de medicos que o utente pode consultar.
+     */
+    int * exames_medicos;
 };
 
 typedef struct node{//no node tem pessoa e prox

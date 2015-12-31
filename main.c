@@ -109,9 +109,9 @@ void finalizar_atendimento_utentes(struct fase *fase_atual, struct fase *fase_se
              * do cliente deve ser finalizado nesta fase e redirecionado para
              * a proxima fase.
              */
-            struct status_fase fase_utente = utente->status_fase[fase_atual->numero_fase];
-            if(chegou_momento_de_finalizar_atendimento_utente(minuto_atual, fase_utente)){
-                int tempo_partida = calcular_tempo_partida_do_utente_na_fila(fase_utente);
+            struct status_fase status_fase_utente = utente->status_fase[fase_atual->numero_fase];
+            if(chegou_momento_de_finalizar_atendimento_utente(minuto_atual, status_fase_utente)){
+                int tempo_partida = calcular_tempo_partida_do_utente_na_fila(status_fase_utente);
                 utente->status_fase[fase_atual->numero_fase].tempo_partida=tempo_partida;
                 //indica que o servidor agora está livre pois o utente terminou de ser atendido
                 fase_atual->servidores[i]=NULL;
@@ -136,13 +136,15 @@ void chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(struct fase fa
         }
 
 }
+
 int main(int argc, char** argv) {
     /*Parâmetros da simulação*/
+    int total_maximo_consulta_medicas_por_utente=2;
+    double intervalo_medio_entre_chegadas_utentes = 8.5;
+    int total_minutos_simulacao = 80;
     int total_servidores_fases[TOTAL_FASES] = {2, 2, 4, 2};
     int total_filas_fases[TOTAL_FASES] = {1, 4, 4, 4};
     int tempo_max_atendimento_fases[TOTAL_FASES]={8, 15, 40, 50};
-    double intervalo_medio_entre_chegadas_utentes = 8.5;
-    int total_minutos_simulacao = 80;
 
     
     /*A seed será a hora atual, assim,
@@ -172,9 +174,13 @@ int main(int argc, char** argv) {
     }   
     printf("\nRecepção de novos utentes encerrada no minuto %d. Somente os utentes atuais serão atendidos\n\n", minuto_atual);
     
-    while(total_utentes_atualmente_em_todas_fases(fases) > 0){
+    /*Enquanto houver utentes na fila ou sendo atendidos pelos servidores,
+     continua a simulação até que todos os utentes tenham terminado de ser atendidos*/
+    while(total_utentes_atualmente_em_fila_em_todas_as_fases(fases) > 0 ||
+            total_utentes_em_atendimento_em_todas_fases(fases) >0){
         chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(fases, ++minuto_atual);
     }
+       
     printf("\nFinalização do atendimento de todos os utentes no minuto %d\n\n", minuto_atual);
     
     int total_pessoas=0;
