@@ -45,19 +45,23 @@ void inicializar_filas_fase(struct fase *fase){
     }
 }
 
-void inicializar_fases(struct fase fases[TOTAL_FASES], 
+void inicializar_simulacao(simulacao *sim, 
         int total_filas_fase[TOTAL_FASES], 
         int total_servidores_fase[TOTAL_FASES],
         int tempo_max_atendimento_fases[TOTAL_FASES]){
     
+    inicializar_seed(sim->seed);
+    //Inicializa o gerador com a média desejada
+    inicializar_poisson(sim->intervalo_medio_entre_chegadas_utentes);
+    
     for(int i = 0; i < TOTAL_FASES; i++){
-        fases[i].numero_fase = i;
-        fases[i].total_filas = total_filas_fase[i];
-        fases[i].total_servidores = total_servidores_fase[i];
-        fases[i].tempo_max_atendimento= tempo_max_atendimento_fases[i];
+        sim->fases[i].numero_fase = i;
+        sim->fases[i].total_filas = total_filas_fase[i];
+        sim->fases[i].total_servidores = total_servidores_fase[i];
+        sim->fases[i].tempo_max_atendimento= tempo_max_atendimento_fases[i];
         
-        inicializar_servidores_fase(&fases[i]);        
-        inicializar_filas_fase(&fases[i]);
+        inicializar_servidores_fase(&sim->fases[i]);        
+        inicializar_filas_fase(&sim->fases[i]);
     }
 }
 
@@ -225,4 +229,24 @@ int total_utentes_em_atendimento_em_todas_fases(struct fase fases[TOTAL_FASES]){
         total_utentes +=total_utentes_em_atendimento(fases[i]);
     }
     return total_utentes;
+}
+
+int total_utentes_chegados_no_sistema(simulacao sim){
+    int total_utentes_chegados=0;
+    for(int i=0;i<sim.fases[0].total_filas; i++){
+        total_utentes_chegados += sim.fases[0].filas[i]->total_utentes_chegados;
+    }    
+    return total_utentes_chegados;
+}
+
+void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim){
+    //Libera todas as filas criadas em cada fase
+    for(int i=0; i<TOTAL_FASES; i++){
+        //Libera cada fila da fase atual
+        limpar_vetor_filas(sim->fases[i].filas, sim->fases[i].total_filas);
+        //Libera o vetor de filas da fase
+        free(sim->fases[i].filas);
+        //Libera o vetor de servidores da fase
+        free(sim->fases[i].servidores);
+    }
 }

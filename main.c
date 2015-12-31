@@ -139,25 +139,20 @@ void chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(struct fase fa
 
 int main(int argc, char** argv) {
     /*Parâmetros da simulação*/
-    int total_maximo_consulta_medicas_por_utente=2;
-    double intervalo_medio_entre_chegadas_utentes = 8.5;
-    int total_minutos_simulacao = 80;
-    int total_servidores_fases[TOTAL_FASES] = {2, 2, 4, 2};
-    int total_filas_fases[TOTAL_FASES] = {1, 4, 4, 4};
-    int tempo_max_atendimento_fases[TOTAL_FASES]={8, 15, 40, 50};
-
+    struct simulacao sim;
     
     /*A seed será a hora atual, assim,
      cada rodada gerará resultados diferentes.
      Coloque uma seed fixa e verá sempre os mesmos resultados.*/
-    long seed = time(NULL);
-    struct fase fases[TOTAL_FASES];
-    int minuto_atual, total_utentes = 0;
+    sim.seed = time(NULL);
+    sim.total_maximo_consulta_medicas_por_utente=2;
+    sim.intervalo_medio_entre_chegadas_utentes = 8.5;
+    sim.total_minutos_simulacao = 80;
+    int total_servidores_fases[TOTAL_FASES] = {2, 2, 4, 2};
+    int total_filas_fases[TOTAL_FASES] = {1, 4, 4, 4};
+    int tempo_max_atendimento_fases[TOTAL_FASES]={8, 15, 40, 50};
     
-    inicializar_seed(seed);
-    //Inicializa o gerador com a média desejada
-    inicializar_poisson(intervalo_medio_entre_chegadas_utentes);
-    inicializar_fases(fases, total_filas_fases, total_servidores_fases, tempo_max_atendimento_fases);        
+    inicializar_simulacao(&sim, total_filas_fases, total_servidores_fases, tempo_max_atendimento_fases);        
     
     /* 
     //verifica se a media das somas bate com a media do intervalo medio entre chegadas
@@ -168,33 +163,23 @@ int main(int argc, char** argv) {
     printf("média: %f\n\n", soma/total_minutos); 
     */
     
-    for(minuto_atual = 1; minuto_atual <= total_minutos_simulacao; minuto_atual++){
-        inserir_utente_na_fila_fase1(&fases[0], minuto_atual);
-        chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(fases, minuto_atual);
+    for(sim.minuto_atual = 1; sim.minuto_atual <= sim.total_minutos_simulacao; sim.minuto_atual++){
+        inserir_utente_na_fila_fase1(&sim.fases[0], sim.minuto_atual);
+        chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(sim.fases, sim.minuto_atual);
     }   
-    printf("\nRecepção de novos utentes encerrada no minuto %d. Somente os utentes atuais serão atendidos\n\n", minuto_atual);
+    printf("\nRecepção de novos utentes encerrada no minuto %d. Somente os utentes atuais serão atendidos\n\n", sim.minuto_atual);
     
     /*Enquanto houver utentes na fila ou sendo atendidos pelos servidores,
      continua a simulação até que todos os utentes tenham terminado de ser atendidos*/
-    while(total_utentes_atualmente_em_fila_em_todas_as_fases(fases) > 0 ||
-            total_utentes_em_atendimento_em_todas_fases(fases) >0){
-        chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(fases, ++minuto_atual);
+    while(total_utentes_atualmente_em_fila_em_todas_as_fases(sim.fases) > 0 ||
+            total_utentes_em_atendimento_em_todas_fases(sim.fases) >0){
+        chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(sim.fases, ++sim.minuto_atual);
     }
        
-    printf("\nFinalização do atendimento de todos os utentes no minuto %d\n\n", minuto_atual);
+    printf("\nFinalização do atendimento de todos os utentes no minuto %d\n\n", sim.minuto_atual);
+    printf("Total geral de pessoas que chegaram: %d\n", total_utentes_chegados_no_sistema(sim));
     
-    int total_pessoas=0;
-    for(int i=0;i<fases[0].total_filas; i++){
-        total_pessoas += fases[0].filas[i]->total_utentes_chegados;
-    }    
-    
-    printf("Total geral de pessoas que chegaram: %d\n", total_pessoas);
-    printf("Pessoas na fila:\n");
-    
-    //Libera todas as filas criadas
-    for(int i=0; i<TOTAL_FASES; i++){
-        limpar_vetor_filas(fases[i].filas, fases[i].total_filas);
-    }
+    liberar_filas_servidores_e_utentes_simulacao(&sim);
     return 0;
 }
 

@@ -3,7 +3,6 @@
 #include "tipos.h"
 
 
-
 /**
  * O lambda é 1/a media do tempo de chegada;
  */
@@ -14,11 +13,11 @@ double lambda;
  * os vetores de servidores e de filas e inicializar cada servidor e cada fila
  * destes vetores.
  * 
- * @param fases Vetor de fases a ser inicializado
+ * @param sim Struc contendo todos os dados da simulação
  * @param total_filas_fase Vetor contendo o total de filas em cada fase
  * @param total_servidores_fase Vetor contendo o total de servidors em cada fase
  */
-void inicializar_fases(struct fase fases[TOTAL_FASES], 
+void inicializar_simulacao(simulacao *sim, 
         int total_filas_fase[TOTAL_FASES], 
         int total_servidores_fase[TOTAL_FASES],
         int tempo_max_atendimento_fases[TOTAL_FASES]);
@@ -113,6 +112,17 @@ int total_utentes_atualmente_em_fila(struct fase fase);
 int total_utentes_atualmente_em_fila_em_todas_as_fases(struct fase fases[TOTAL_FASES]);
 int total_utentes_em_atendimento(struct fase fase);
 int total_utentes_em_atendimento_em_todas_fases(struct fase fases[TOTAL_FASES]);
+/**
+ * 
+ * @param sim
+ * @return total geral de utentes que chegaram no sistema.
+ */
+int total_utentes_chegados_no_sistema(simulacao sim);
 
+/**
+ * Libera todas as variáveis alocadas dinamicamente para a simulação
+ * @param sim
+ */
+void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim);
 #endif	/* SIMULACAO_H */
 

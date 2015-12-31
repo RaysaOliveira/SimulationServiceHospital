@@ -95,6 +95,15 @@ struct fase{
     struct fila **filas;
 };
 
+ typedef struct simulacao {
+    long seed;
+    int total_maximo_consulta_medicas_por_utente;
+    double intervalo_medio_entre_chegadas_utentes;
+    int total_minutos_simulacao;
+    struct fase fases[TOTAL_FASES];
+    int minuto_atual;
+} simulacao;
+
 
 #endif	/* TIPOS_H */
 
