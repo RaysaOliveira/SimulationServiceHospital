@@ -85,24 +85,8 @@ int gerar_novo_atendimento_medico(int *total_atendimento);
 int escolher_especialidade();
 
 /**
- * Defini se o utente vai fazer exame novamente ou não. 
- * @return 0 caso o utente não faça exame e 1 se ele fizer exame
- */
-int gerar_exame();
-
-
-/**
- * Escolhe aleatoriamente um de 4 tipos de exame;
- * @return um valor para representar o exame escolhido 
- * 1 = exame de mama
- * 2 = eletrocardiograma
- * 3 = exame de sangue
- * 4 = exame de urina
- */
-int escolher_exame();
-
-/**
- * Gera o total de exames para cada utente.
+ * Gera aleatoriamente um valor uniform entre 0 e o simulacao.max_consulta_medicas_por_utente
+ * para indicar o total de exames que o utente fará.
  * @param sim
  * @return 
  */
@@ -140,20 +124,6 @@ int total_utentes_chegados_no_sistema(simulacao sim);
  */
 void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim);
 
-/**
- * Retorna a proxima posicao livre no vetor de exames
- * @param sim
- * @param utente
- * @return o indice da posicao livre ou -1 caso todas as posicoes estejam preenchidas
- */
-int encontrar_idx_proxima_posicao_livre_exame(simulacao *sim, struct utente *utente);
-
-int encontrar_idx_ultima_posicao_preenchida_exame(simulacao *sim, struct utente *utente);
-
-int encontrar_idx_proxima_posicao_livre_retorno_medico(simulacao *sim, struct utente *utente);
-int encontrar_idx_ultima_posicao_preenchida_retorno_medico(simulacao *sim, struct utente *utente);
-
-int total_medicos_consultados_pelo_utente(simulacao *sim, struct utente *utente);
 #endif	/* SIMULACAO_H */
 
 

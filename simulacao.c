@@ -133,20 +133,6 @@ int escolher_especialidade() {
     return 3;
 }
 
-int gerar_exame() {
-    float aleatorio = ran0(&seed);
-
-    /*@todo As probabilidades serao definidas e passadas por paramentro para a função;
-     * Aqui vou utilizar estas probabilidades:
-     * [0.0...0,5] - fazer exame
-     * ]0.5...1.0] - nao fazer
-     */
-    if (aleatorio > 0.5) {
-        return 1;
-    }
-    return 0;
-}
-
 int vai_para_outro_medico(simulacao *sim, struct utente *utente){
     float aleatorio = ran0(&seed);
     
@@ -156,30 +142,6 @@ int vai_para_outro_medico(simulacao *sim, struct utente *utente){
     }
     
     return 0;    
-}
-
-int escolher_exame() {
-
-    float aleatorio = ran0(&seed);
-
-    /*
-     * @todo É preciso definir tais probabilidades por parâmetro de linha de comando
-     * Exemplos de probabilidades. É preciso ordenar as prioridades para que 
-     * o código funcione:
-     [0.0 .. 0.1] = exame 1
-     ]0.1 .. 0.3] = exame 2
-     ]0.3 .. 0.6] = exame 3
-     ]0.6 .. 1.0] = exame 4
-     */
-
-    if (aleatorio <= 0.1)
-        return 1;
-    if (aleatorio <= 0.3)
-        return 4;
-    if (aleatorio <= 0.6)
-        return 2;
-
-    return 3;
 }
 
 int gerar_duracao_atendimento(struct fase *fase){
@@ -265,33 +227,4 @@ void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim){
         free(sim->fases[i].servidores);
     }  
     limpar_fila(sim->fila_utentes_finalizados);
-}
-
-int encontrar_idx_proxima_posicao_livre_exame(simulacao *sim, struct utente *utente){
-    for(int i=0; i<sim->max_consulta_medicas_por_utente; i++){
-        if (utente->exames_medicos[i] == -1)
-            return i;
-    }
-    return -1;
-}
-
-int encontrar_idx_ultima_posicao_preenchida_exame(simulacao *sim, struct utente *utente){
-    /*a última posição preenchida do vetor de exame
-     é a posição anterior a última livre*/
-    return encontrar_idx_proxima_posicao_livre_exame(sim, utente) - 1;
-}
-
-
-int encontrar_idx_proxima_posicao_livre_retorno_medico(simulacao *sim, struct utente *utente){
-    for(int i=0; i <sim->max_consulta_medicas_por_utente; i++){
-        if (utente->retorno_medicos[i] == -1)
-            return i;
-    }
-    return -1;
-}
-
-int encontrar_idx_ultima_posicao_preenchida_retorno_medico(simulacao *sim, struct utente *utente){
-    /*a última posição preenchida do vetor retorno_medico
-     é a posição anterior a última livre*/
-    return encontrar_idx_proxima_posicao_livre_retorno_medico(sim, utente) - 1;
 }
