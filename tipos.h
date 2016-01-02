@@ -33,6 +33,11 @@ struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
     int * retorno_medicos;
     
     /**
+     * Indica os tipos de médico em que o utente foi atendido.
+     */
+    int * especialidades_medicas_consultadas;
+    
+    /**
      * vetor para controlar o total de exames solicitados por cada médico. O tamanho max dele é 
      * a quantidade maxima de medicos que o utente pode consultar.
      * Cada posição do vetor indica se o médico do índice indicado 

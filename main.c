@@ -140,6 +140,11 @@ void verificar_e_redirecionar_utente_fase_exame(simulacao *sim, struct fase *fas
 
 void finalizar_atendimento_utente_fase_medico(simulacao *sim, struct fase *fase_atual, struct utente *utente){
     int idx_medico_atual = utente->total_atendimentos_concluidos;
+    /*Se ainda náo foi definida a especialidade para qual o utente vai
+     * para a consulta atual, define agora*/
+    if(utente->especialidades_medicas_consultadas[idx_medico_atual] == -1)
+        utente->especialidades_medicas_consultadas[idx_medico_atual] = escolher_especialidade();
+
     //se está retornando ao médico atual
     if(utente->retorno_medicos[idx_medico_atual]==1){
         utente->total_atendimentos_concluidos++;

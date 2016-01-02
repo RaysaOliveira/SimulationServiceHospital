@@ -24,6 +24,7 @@ void limpar_fila(struct fila *f){
         struct utente * utente = remover_inicio(f);
         free(utente->exames_medicos);
         free(utente->retorno_medicos);
+        free(utente->especialidades_medicas_consultadas);
         free(utente);
     }
 }    
@@ -103,10 +104,13 @@ void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase){
          printf("espera %3d", espera);
     else printf("       %3s", "-");
     
-    printf(" Exa. ");
+    printf("\n                      Exa. ");
     for(int i = 0; i < 2 && utente->exames_medicos[i] != -1; i++)
          printf("%2d ", utente->exames_medicos[i]);
     
+    printf("Esp. ");
+    for(int i = 0; i < 2 && utente->especialidades_medicas_consultadas[i] != -1; i++)
+         printf("%2d ", utente->especialidades_medicas_consultadas[i]);
     
     printf("\n");
 }
@@ -165,6 +169,7 @@ struct utente * criar_e_inicializar_utente(int max_consulta_medicas_por_utente){
      */
     utente->retorno_medicos= malloc(sizeof(int) * max_consulta_medicas_por_utente);
     utente->exames_medicos = malloc(sizeof(int) * max_consulta_medicas_por_utente);
+    utente->especialidades_medicas_consultadas = malloc(sizeof(int) * max_consulta_medicas_por_utente);
     utente->total_atendimentos_concluidos = 0;
     
     /*O valor -1 indica que a posição nunca foi preenchida.
@@ -174,5 +179,6 @@ struct utente * criar_e_inicializar_utente(int max_consulta_medicas_por_utente){
      não foi atendido por aquele médico*/
     inicializar_vetor(utente->retorno_medicos, max_consulta_medicas_por_utente, -1);
     inicializar_vetor(utente->exames_medicos, max_consulta_medicas_por_utente, -1);
+    inicializar_vetor(utente->especialidades_medicas_consultadas, max_consulta_medicas_por_utente, -1);
     return utente;
 }

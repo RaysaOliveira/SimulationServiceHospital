@@ -1,8 +1,6 @@
 /* 
  *
- * @TODO A funcao poisson é apenas para teste. Verificar o artigo
- * http://preshing.com/20111007/how-to-generate-random-timings-for-a-poisson-process/ 
- * para implementa-la corretamente
+ * Fonte: http://preshing.com/20111007/how-to-generate-random-timings-for-a-poisson-process/ 
  */
 
 #include "simulacao.h"
@@ -96,11 +94,10 @@ int gerar_prioridade() {
     return 2;
 }
 
-int gerar_atendimento(int *total_atendimento) {
+int gerar_novo_atendimento_medico(int *total_atendimento) {
     float aleatorio = ran0(&seed);
 
-    /* @todo
-     * As probabilidades serao definidas e passadas por paramentro para função;
+    /* @todo As probabilidades serao definidas e passadas por paramentro para função;
      * Aqui vou utilizar estas probabilidades:
      * [0.0...0.5] - ser atendido
      * ]0.5...1.0] nao ser atendido
@@ -139,8 +136,7 @@ int escolher_especialidade() {
 int gerar_exame() {
     float aleatorio = ran0(&seed);
 
-    /*@todo
-     * As probabilidades serao definidas e passadas por paramentro para a função;
+    /*@todo As probabilidades serao definidas e passadas por paramentro para a função;
      * Aqui vou utilizar estas probabilidades:
      * [0.0...0,5] - fazer exame
      * ]0.5...1.0] - nao fazer

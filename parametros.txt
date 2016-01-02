@@ -1,0 +1,6 @@
+tempo_total_simulacao = 75
+total_servidores_fases = 2 2 4 2
+total_filas_fases = 1 4 4 4
+tempo_max_atendimento_fases = 8 15 40 50
+probabilidades_prioridades = 0.1 0.3 0.6 1.0
+probabilidade_de_utente_consultar_com_segundo_medico = 0.5

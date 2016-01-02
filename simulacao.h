@@ -72,7 +72,7 @@ int gerar_prioridade();
  * @param total_atendimento total de vezes que o utente foi atendido.
  * @return 0 caso o utente não seja atendido e 1 se ele for atendido
  */
-int gerar_atendimento(int *total_atendimento);
+int gerar_novo_atendimento_medico(int *total_atendimento);
 
 /**
  * Escolhe aleatoriamente uma de 4 especialidades;
