@@ -237,8 +237,9 @@ void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim){
 }
 
 void imprimir_parametros_simulacao(simulacao *sim){
-    printf("\tmax_consulta_medicas_por_utente: %d\n", sim->max_consulta_medicas_por_utente);
     printf("\ttotal_minutos_simulacao: %d\n", sim->total_minutos_simulacao);
+    printf("\ttotal_simulacoes: %d\n", sim->total_simulacoes);
+    printf("\tmax_consulta_medicas_por_utente: %d\n", sim->max_consulta_medicas_por_utente);
     printf("\tprobabilidade_de_utente_consultar_com_segundo_medico: %.2f\n", sim->probabilidade_de_utente_consultar_com_segundo_medico);
     
     printf("\ttotal de servidores    por fase: ");
@@ -265,5 +266,5 @@ void imprimir_parametros_simulacao(simulacao *sim){
     for(int i = 0; i < TOTAL_ESPECIALIDADES_MEDICAS; i++)   
         printf("\tprobabilidades_especialidade_medica%d: %.2f\n", i, sim->probabilidades_especialidade_medica[i]);
     
-    printf("\n");
+    printf("---------------------------------------------------------------------------\n");
 }

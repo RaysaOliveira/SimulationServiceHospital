@@ -12,6 +12,10 @@
 #define TOTAL_PRIORIDADES 4
 #define TOTAL_ESPECIALIDADES_MEDICAS 4
 
+/**
+ * Struct utilizada pelo utente para armazenar os tempos
+ * em cada fase do atendimento.
+ */
 struct status_fase{
     int tempo_chegada;
     int tempo_inicio_atendimento;
@@ -19,7 +23,7 @@ struct status_fase{
     int tempo_partida; 
 };
 
-struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
+struct utente{
     int id;
     struct status_fase status_fase[TOTAL_FASES];
     int prioridade;  
@@ -156,7 +160,18 @@ struct fase{
     struct fila *fila_utentes_finalizados;
     int minuto_atual;
     
+    /**Indica se em cada simulação serão impressos dados de cada utente a 
+     medica que eles passam pelas fases do atendimento.
+     0 indica que não serão impressos e 1 que serão.*/
+    int imprimir_dados_utentes_individuais;
 } simulacao;
+
+/**
+ * Armazena os dados para uma simulação, como médias e desvios padrões.
+ */
+struct estatisticas {
+    float media_tempo_espera_fila;
+};
 
 
 #endif	/* TIPOS_H */

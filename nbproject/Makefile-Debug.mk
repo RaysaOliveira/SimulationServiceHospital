@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/estatisticas.o \
 	${OBJECTDIR}/fila.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/parametros.o \
@@ -65,6 +66,11 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trab_cc: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/trab_cc ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/estatisticas.o: estatisticas.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/estatisticas.o estatisticas.c
 
 ${OBJECTDIR}/fila.o: fila.c 
 	${MKDIR} -p ${OBJECTDIR}

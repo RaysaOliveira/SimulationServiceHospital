@@ -118,6 +118,10 @@ void carregar_parametros_arquivo(simulacao *sim,
                 if(valor_parametro > 0)
                     probabilidades_especialidade_medica[i] = valor_parametro;
             }
+                        
+            valor_parametro = obter_valor_parametro_float(linha_arquivo, "imprimir_dados_utentes_individuais");
+            if(valor_parametro > 0)
+                sim->imprimir_dados_utentes_individuais = valor_parametro;
             
         }
         fclose(arquivo);
