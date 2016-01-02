@@ -20,7 +20,9 @@ double lambda;
 void inicializar_simulacao(simulacao *sim, 
         int total_filas_fase[TOTAL_FASES], 
         int total_servidores_fase[TOTAL_FASES],
-        int tempo_max_atendimento_fases[TOTAL_FASES]);
+        int tempo_max_atendimento_fases[TOTAL_FASES],
+        float probabilidades_prioridades[TOTAL_PRIORIDADES], 
+        float probabilidades_especialidade_medica[TOTAL_ESPECIALIDADES_MEDICAS]);
 
 /**
  * Verifica se o servidor na posição indicada está livre
@@ -123,6 +125,8 @@ int total_utentes_chegados_no_sistema(simulacao sim);
  * @param sim
  */
 void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim);
+
+void imprimir_parametros_simulacao(simulacao *sim);
 
 #endif	/* SIMULACAO_H */
 

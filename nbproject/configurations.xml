@@ -5,6 +5,7 @@
                    displayName="Arquivos de Cabeçalho"
                    projectFiles="true">
       <itemPath>fila.h</itemPath>
+      <itemPath>parametros.h</itemPath>
       <itemPath>random.h</itemPath>
       <itemPath>simulacao.h</itemPath>
       <itemPath>tipos.h</itemPath>
@@ -14,6 +15,7 @@
                    projectFiles="true">
       <itemPath>fila.c</itemPath>
       <itemPath>main.c</itemPath>
+      <itemPath>parametros.c</itemPath>
       <itemPath>random.c</itemPath>
       <itemPath>simulacao.c</itemPath>
     </logicalFolder>
@@ -32,7 +34,7 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>parametros.txt</itemPath>
+    <itemPath>parametros-simulacao.txt</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -50,7 +52,11 @@
       </item>
       <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="parametros.txt" ex="false" tool="3" flavor2="0">
+      <item path="parametros-simulacao.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="parametros.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="parametros.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="random.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -89,7 +95,11 @@
       </item>
       <item path="main.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="parametros.txt" ex="false" tool="3" flavor2="0">
+      <item path="parametros-simulacao.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="parametros.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="parametros.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="random.c" ex="false" tool="0" flavor2="0">
       </item>

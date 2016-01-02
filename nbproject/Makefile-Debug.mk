@@ -37,6 +37,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/fila.o \
 	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/parametros.o \
 	${OBJECTDIR}/random.o \
 	${OBJECTDIR}/simulacao.o
 
@@ -74,6 +75,11 @@ ${OBJECTDIR}/main.o: main.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+
+${OBJECTDIR}/parametros.o: parametros.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/parametros.o parametros.c
 
 ${OBJECTDIR}/random.o: random.c 
 	${MKDIR} -p ${OBJECTDIR}

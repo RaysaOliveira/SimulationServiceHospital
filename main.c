@@ -7,7 +7,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
 
 //como o incluide foi criado por mim, nao coloca <> e sim entre ""
@@ -15,6 +14,7 @@
 #include "fila.h" 
 
 #include "simulacao.h"
+#include "parametros.h"
 #include "random.h"
 
 void inserir_utente_na_fila_fase1(simulacao *sim){
@@ -43,12 +43,12 @@ void inserir_utente_na_fila_fase1(simulacao *sim){
     }
 }
 
-void redirecionar_utente_para_fase_seguinte(struct fase *fase_seguinte, struct utente * utente, int minuto_atual){
-    utente->status_fase[fase_seguinte->numero_fase].tempo_chegada=minuto_atual;
+void redirecionar_utente_para_fase_seguinte(simulacao *sim, struct fase *fase_seguinte, struct utente * utente){
+    utente->status_fase[fase_seguinte->numero_fase].tempo_chegada=sim->minuto_atual;
     utente->status_fase[fase_seguinte->numero_fase].tempo_inicio_atendimento = 0;
     //Se prioridade for igual a -1 indica que a prioridade nao foi definida e precisa ser definida nesta fase
     if(utente->prioridade==-1)
-        utente->prioridade = gerar_prioridade();
+        utente->prioridade = gerar_prioridade(sim);
     utente->status_fase[fase_seguinte->numero_fase].duracao_atendimento = 0;
     utente->status_fase[fase_seguinte->numero_fase].tempo_partida = 0;
     int prioridade = utente->prioridade;
@@ -130,11 +130,11 @@ void verificar_e_redirecionar_utente_fase_exame(simulacao *sim, struct fase *fas
         /*Redireciona o utente para uma fila da mesma fase para
           que ele aguarde atendimento de outro médico*/
         if(vai_para_outro_medico(sim, utente)) 
-            redirecionar_utente_para_fase_seguinte(fase_atual, utente, sim->minuto_atual); 
+            redirecionar_utente_para_fase_seguinte(sim, fase_atual, utente); 
         else inserir_utente_fila_finalizados(sim, fase_atual, utente);
     } else {
         struct fase *fase_seguinte = &sim->fases[fase_atual->numero_fase+1];
-        redirecionar_utente_para_fase_seguinte(fase_seguinte, utente, sim->minuto_atual); 
+        redirecionar_utente_para_fase_seguinte(sim, fase_seguinte, utente); 
     }
 }
 
@@ -143,13 +143,13 @@ void finalizar_atendimento_utente_fase_medico(simulacao *sim, struct fase *fase_
     /*Se ainda náo foi definida a especialidade para qual o utente vai
      * para a consulta atual, define agora*/
     if(utente->especialidades_medicas_consultadas[idx_medico_atual] == -1)
-        utente->especialidades_medicas_consultadas[idx_medico_atual] = escolher_especialidade();
+        utente->especialidades_medicas_consultadas[idx_medico_atual] = escolher_especialidade(sim);
 
     //se está retornando ao médico atual
     if(utente->retorno_medicos[idx_medico_atual]==1){
         utente->total_atendimentos_concluidos++;
         if(vai_para_outro_medico(sim, utente))
-            redirecionar_utente_para_fase_seguinte(fase_atual, utente, sim->minuto_atual);
+            redirecionar_utente_para_fase_seguinte(sim, fase_atual, utente);
         else inserir_utente_fila_finalizados(sim, fase_atual, utente); 
     }
     else verificar_e_redirecionar_utente_fase_exame(sim, fase_atual, utente);
@@ -161,7 +161,7 @@ void finalizar_atendimento_utente_fase_exame(simulacao *sim, struct fase *fase_a
     solicitados por ele*/
     utente->retorno_medicos[idx_medico_atual] = 1;
     struct fase *fase_anterior = &sim->fases[fase_atual->numero_fase-1];
-    redirecionar_utente_para_fase_seguinte(fase_anterior, utente, sim->minuto_atual);         
+    redirecionar_utente_para_fase_seguinte(sim, fase_anterior, utente);         
 }
 
 /**
@@ -192,7 +192,7 @@ void finalizar_atendimento_utentes(simulacao * sim, struct fase *fase_atual){
                  nestes casos será sempre a ase_atual->numero_fase + 1*/
                 if(fase_atual->numero_fase <= 1) {
                     struct fase *fase_seguinte = &sim->fases[fase_atual->numero_fase+1];
-                    redirecionar_utente_para_fase_seguinte(fase_seguinte, utente, sim->minuto_atual);
+                    redirecionar_utente_para_fase_seguinte(sim, fase_seguinte, utente);
                 }
                 else if(fase_atual->numero_fase==2)
                     finalizar_atendimento_utente_fase_medico(sim, fase_atual, utente);
@@ -210,77 +210,77 @@ void chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(simulacao *sim
     }
 }
 
-void analisa_parametros(simulacao *sim, int argc, char** argv){
-    printf("\nTotal de parâmetros recebidos via linha de comando: %d\n", argc);
-    printf("Lista de parâmetros\n");
-    for(int i = 0; i < argc; i++){
-        printf("%d - %s\n", i, argv[i]);
-        if(strcmp(argv[i], "-p1")==0){
-            if(argv[i+1]==NULL){
-            }
-        }
-    }
-    printf("\n");
-}
-
-/**
- * Inicia o programa
- * @param argc Indica o total de parâmetros recebidos pelo programa via linha
- * de comando. O nome do programa já é o primeiro parâmetro. Assim, o valor
- * mínimo de argc é 1
- * @param argv É um vetor de strings onde cada string representa um parâmetro 
- * recebido via linha de comando.
- * @return 
- */
-int main(int argc, char** argv) {    
-    /*Parâmetros da simulação*/
-    struct simulacao sim;
-    
-    /*A seed será a hora atual, assim,
-     cada rodada gerará resultados diferentes.
-     Coloque uma seed fixa e verá sempre os mesmos resultados.*/
-    sim.seed = time(NULL);
-    sim.max_consulta_medicas_por_utente=2;
-    sim.intervalo_medio_entre_chegadas_utentes = 8.5;
-    sim.total_minutos_simulacao = 80;
-    int total_servidores_fases[TOTAL_FASES] = {2, 2, 4, 2};
-    int total_filas_fases[TOTAL_FASES] = {1, 4, 4, 4};
-    int tempo_max_atendimento_fases[TOTAL_FASES] = {8, 15, 40, 50};
-
-    analisa_parametros(&sim, argc, argv);
-    
-    inicializar_simulacao(&sim, total_filas_fases, total_servidores_fases, tempo_max_atendimento_fases);        
-    
+int main(int argc, char** argv) {  
     /* 
-    //verifica se a media das somas bate com a media do intervalo medio entre chegadas
-    int i;
+    //verifica se a média das somas das chamadas de poisson() bate com a média do intervalo médio entre chegadas
+    int i, total_minutos = 80;
     float soma = 0;
     for(i = 0; i < total_minutos; i++)
         soma += poisson();
     printf("média: %f\n\n", soma/total_minutos); 
     */
     
-    for(sim.minuto_atual = 1; sim.minuto_atual <= sim.total_minutos_simulacao; sim.minuto_atual++){
-        inserir_utente_na_fila_fase1(&sim);
-        chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(&sim);
-    }   
-    printf("\nRecepção de novos utentes encerrada no minuto %d. Somente os utentes atuais serão atendidos\n\n", sim.minuto_atual);
-    
-    /*Enquanto houver utentes na fila ou sendo atendidos pelos servidores,
-     continua a simulação até que todos os utentes tenham terminado de ser atendidos*/
-    while(total_utentes_atualmente_em_fila_em_todas_as_fases(sim.fases) > 0 ||
-            total_utentes_em_atendimento_em_todas_fases(sim.fases) >0){
-        ++sim.minuto_atual;
-        chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(&sim);
+    struct simulacao sim;
+    /*Parâmetros para todas as simulações*/
+    sim.max_consulta_medicas_por_utente=2;
+    sim.intervalo_medio_entre_chegadas_utentes = 8.5;
+    sim.total_minutos_simulacao = 80;
+    sim.total_simulacoes = 1;
+    sim.probabilidade_de_utente_consultar_com_segundo_medico = 0.5;
+    int total_servidores_fases[TOTAL_FASES] = {2, 2, 4, 2};
+    int total_filas_fases[TOTAL_FASES] = {1, 4, 4, 4};
+    int tempo_max_atendimento_fases[TOTAL_FASES] = {8, 15, 40, 50};
+    float probabilidades_prioridades[4] = {0.1, 0.3, 0.6, 1.0};
+    float probabilidades_especialidade_medica[4] = {0.1, 0.3, 0.6, 1.0};
+
+    /*Carrega os parâmetros do arquivo.
+     Se o arquivo não existir ou determinados parâmetros
+     não forem setados, os valores para os parâmetros em falta
+     serão os setados por default nas variáveis acima*/
+    carregar_parametros_arquivo(&sim, 
+            total_filas_fases, total_servidores_fases, tempo_max_atendimento_fases,
+            probabilidades_prioridades, probabilidades_especialidade_medica);
+
+    for(int i = 0; i < sim.total_simulacoes; i++){
+        /*A seed será a hora atual, assim,
+         cada rodada gerará resultados diferentes.
+         Coloque uma seed fixa e verá sempre os mesmos resultados.*/
+        sim.seed = time(NULL);
+
+        //Pega os parâmetros das variáveis acima e seta de fato na struct simulacao
+        inicializar_simulacao(&sim, 
+                total_filas_fases, total_servidores_fases, tempo_max_atendimento_fases,
+                probabilidades_prioridades, probabilidades_especialidade_medica);        
+        
+        //só imprime os parâmetros para a 1a simulação, pois serão iguais para todas
+        if(i == 0) {
+            imprimir_parametros_simulacao(&sim);
+        }
+        printf("Iniciada simulação %d de %d\n", i, sim.total_simulacoes);
+
+
+        for(sim.minuto_atual = 1; sim.minuto_atual <= sim.total_minutos_simulacao; sim.minuto_atual++){
+            inserir_utente_na_fila_fase1(&sim);
+            chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(&sim);
+        }   
+        printf("\nRecepção de novos utentes encerrada no minuto %d. Somente os utentes atuais serão atendidos\n\n", sim.minuto_atual);
+
+        /*Enquanto houver utentes na fila ou sendo atendidos pelos servidores,
+         continua a simulação até que todos os utentes tenham terminado de ser atendidos*/
+        while(total_utentes_atualmente_em_fila_em_todas_as_fases(sim.fases) > 0 ||
+                total_utentes_em_atendimento_em_todas_fases(sim.fases) >0){
+            ++sim.minuto_atual;
+            chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(&sim);
+        }
+
+        printf("\nFinalização do atendimento de todos os utentes no minuto %d\n\n", sim.minuto_atual);
+        printf("Total geral de pessoas que chegaram: %d\n", total_utentes_chegados_no_sistema(sim));
+
+        //printf("\nUtentes finalizados\n");
+        //listar(sim.fila_utentes_finalizados);
+
+        liberar_filas_servidores_e_utentes_simulacao(&sim);
     }
-       
-    printf("\nFinalização do atendimento de todos os utentes no minuto %d\n\n", sim.minuto_atual);
-    printf("Total geral de pessoas que chegaram: %d\n", total_utentes_chegados_no_sistema(sim));
-    
-    //printf("\nUtentes finalizados\n");
-    //listar(sim.fila_utentes_finalizados);
-    
-    liberar_filas_servidores_e_utentes_simulacao(&sim);
     
     return 0;
 }

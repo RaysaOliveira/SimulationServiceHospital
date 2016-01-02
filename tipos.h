@@ -9,6 +9,8 @@
 #define	TIPOS_H
 
 #define TOTAL_FASES 4
+#define TOTAL_PRIORIDADES 4
+#define TOTAL_ESPECIALIDADES_MEDICAS 4
 
 struct status_fase{
     int tempo_chegada;
@@ -119,8 +121,31 @@ struct fase{
  typedef struct simulacao {
     long seed;
     int max_consulta_medicas_por_utente;
-    double intervalo_medio_entre_chegadas_utentes;
+    float intervalo_medio_entre_chegadas_utentes;
+    float probabilidade_de_utente_consultar_com_segundo_medico;
+    
+    /**
+     * Cada valor define o intervalo de probabilidades para cada prioridade
+     * dos utentes do sistema (que vai de 0 a 3).
+     */
+    float probabilidades_prioridades[TOTAL_PRIORIDADES];
+
+    /**
+     * Cada valor define o intervalo de probabilidades para cada especialidade
+     * médica em que os utentes podem ser atendidos (que vai de 0 a 3).
+     */
+    float probabilidades_especialidade_medica[TOTAL_ESPECIALIDADES_MEDICAS];
+
+    /**
+     * Total de minutos para executar cada simulação
+     */
     int total_minutos_simulacao;
+    
+    /**
+     * Total de simulações a serem executadas
+     */
+    int total_simulacoes;
+    
     struct fase fases[TOTAL_FASES];
     /**
      * Fila para guardar todos os utentes que já finalizaram
@@ -130,6 +155,7 @@ struct fase{
      */
     struct fila *fila_utentes_finalizados;
     int minuto_atual;
+    
 } simulacao;
 
 

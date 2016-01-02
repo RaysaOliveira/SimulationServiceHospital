@@ -9,6 +9,7 @@
 #include "fila.h"
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 static long seed = 9346L;
 
@@ -46,7 +47,9 @@ void inicializar_filas_fase(struct fase *fase){
 void inicializar_simulacao(simulacao *sim, 
         int total_filas_fase[TOTAL_FASES], 
         int total_servidores_fase[TOTAL_FASES],
-        int tempo_max_atendimento_fases[TOTAL_FASES]){
+        int tempo_max_atendimento_fase[TOTAL_FASES],
+        float probabilidades_prioridades[TOTAL_PRIORIDADES], 
+        float probabilidades_especialidade_medica[TOTAL_ESPECIALIDADES_MEDICAS]){
     
     inicializar_seed(sim->seed);
     //Inicializa o gerador com a média desejada
@@ -56,11 +59,17 @@ void inicializar_simulacao(simulacao *sim,
         sim->fases[i].numero_fase = i;
         sim->fases[i].total_filas = total_filas_fase[i];
         sim->fases[i].total_servidores = total_servidores_fase[i];
-        sim->fases[i].tempo_max_atendimento= tempo_max_atendimento_fases[i];
+        sim->fases[i].tempo_max_atendimento= tempo_max_atendimento_fase[i];
         
         inicializar_servidores_fase(&sim->fases[i]);        
         inicializar_filas_fase(&sim->fases[i]);
     }
+    
+    for(int i = 0; i < TOTAL_PRIORIDADES; i++)
+        sim->probabilidades_prioridades[i] = probabilidades_prioridades[i];
+    
+    for(int i = 0; i < TOTAL_ESPECIALIDADES_MEDICAS; i++)
+        sim->probabilidades_especialidade_medica[i] = probabilidades_especialidade_medica[i];
     
     sim->fila_utentes_finalizados = inicializar_fila();
 }
@@ -72,10 +81,9 @@ int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar){
     return 0;
 }
 
-int gerar_prioridade() {
+int gerar_prioridade(simulacao *sim) {
     float aleatorio = ran0(&seed);
     /*
-     * @todo É preciso definir tais probabilidades por parâmetro de linha de comando
      * Exemplos de probabilidades. É preciso ordenar as prioridades para que 
      * o código funcione:
      [0.0 .. 0.1] = prioridade 0
@@ -84,11 +92,11 @@ int gerar_prioridade() {
      ]0.6 .. 1.0] = prioridade 2
      */
 
-    if (aleatorio <= 0.1)
+    if (aleatorio <= sim->probabilidades_prioridades[0])
         return 0;
-    if (aleatorio <= 0.3)
+    if (aleatorio <= sim->probabilidades_prioridades[1])
         return 3;
-    if (aleatorio <= 0.6)
+    if (aleatorio <= sim->probabilidades_prioridades[2])
         return 1;
 
     return 2;
@@ -110,34 +118,33 @@ int gerar_novo_atendimento_medico(int *total_atendimento) {
     return 0;
 }
 
-int escolher_especialidade() {
+int escolher_especialidade(simulacao *sim) {
     float aleatorio = ran0(&seed);
 
     /*
-     * @todo É preciso definir tais probabilidades por parâmetro de linha de comando
      * Exemplos de probabilidades. É preciso ordenar as prioridades para que 
      * o código funcione:
-     [0.0 .. 0.1] = especialidade 1
-     ]0.1 .. 0.3] = especialidade 2
-     ]0.3 .. 0.6] = especialidade 3
-     ]0.6 .. 1.0] = especialidade 4
+     [0.0 .. 0.1] = especialidade 0
+     ]0.1 .. 0.3] = especialidade 1
+     ]0.3 .. 0.6] = especialidade 2
+     ]0.6 .. 1.0] = especialidade 3
      */
 
-    if (aleatorio <= 0.1)
+    if (aleatorio <= sim->probabilidades_especialidade_medica[0])
+        return 0;
+    if (aleatorio <= sim->probabilidades_especialidade_medica[1])
+        return 3;
+    if (aleatorio <= sim->probabilidades_especialidade_medica[2])
         return 1;
-    if (aleatorio <= 0.3)
-        return 4;
-    if (aleatorio <= 0.6)
-        return 2;
     
-    return 3;
+    return 2;
 }
 
 int vai_para_outro_medico(simulacao *sim, struct utente *utente){
     float aleatorio = ran0(&seed);
     
     if(utente->total_atendimentos_concluidos < sim->max_consulta_medicas_por_utente
-    && aleatorio > 0.5) {
+    && aleatorio > sim->probabilidade_de_utente_consultar_com_segundo_medico) {
         return 1;
     }
     
@@ -227,4 +234,36 @@ void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim){
         free(sim->fases[i].servidores);
     }  
     limpar_fila(sim->fila_utentes_finalizados);
+}
+
+void imprimir_parametros_simulacao(simulacao *sim){
+    printf("\tmax_consulta_medicas_por_utente: %d\n", sim->max_consulta_medicas_por_utente);
+    printf("\ttotal_minutos_simulacao: %d\n", sim->total_minutos_simulacao);
+    printf("\tprobabilidade_de_utente_consultar_com_segundo_medico: %.2f\n", sim->probabilidade_de_utente_consultar_com_segundo_medico);
+    
+    printf("\ttotal de servidores    por fase: ");
+    for(int i = 0; i < TOTAL_FASES; i++){
+        printf("%3d ", sim->fases[i].total_servidores);
+    }
+    printf("\n");
+    
+    printf("\ttotal de filas         por fase: ");
+    for(int i = 0; i < TOTAL_FASES; i++){
+        printf("%3d ", sim->fases[i].total_filas);
+    }
+    printf("\n");
+
+    printf("\ttempo máx. atendimento por fase: ");
+    for(int i = 0; i < TOTAL_FASES; i++){
+        printf("%3d ", sim->fases[i].tempo_max_atendimento);
+    }
+    printf("\n");
+
+    for(int i = 0; i < TOTAL_PRIORIDADES; i++) 
+        printf("\tprobabilidades_prioridade%d: %.2f\n", i, sim->probabilidades_prioridades[i]);
+
+    for(int i = 0; i < TOTAL_ESPECIALIDADES_MEDICAS; i++)   
+        printf("\tprobabilidades_especialidade_medica%d: %.2f\n", i, sim->probabilidades_especialidade_medica[i]);
+    
+    printf("\n");
 }
