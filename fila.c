@@ -22,6 +22,8 @@ struct fila * inicializar_fila(){
 void limpar_fila(struct fila *f){
     while(!vazia(f)) {
         struct utente * utente = remover_inicio(f);
+        free(utente->exames_medicos);
+        free(utente->retorno_medicos);
         free(utente);
     }
 }    
@@ -98,10 +100,16 @@ void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase){
     
     int espera = calcular_tempo_espera_na_fila_fase(utente->status_fase[indice_fase]);
     if(espera >= 0)
-         printf("espera %3d\n", espera);
-    else printf("       %3s\n", "-");
+         printf("espera %3d", espera);
+    else printf("       %3s", "-");
     
-}
+    printf(" Ex. ");
+    for(int i = 0; i < 2; i++)
+         printf("%2d ", utente->exames_medicos[i]);
+    
+    
+    printf("\n");
+}\
 
 void listar(struct fila *f){
     if(vazia(f)) {
@@ -133,3 +141,37 @@ struct utente * pesquisar_todas_as_filas_e_remover_utente_maior_prioridade(struc
     return NULL;
 }
 
+
+/**
+ * Inicialia qualquer vetor de inteiros com zero
+ * @param vetor vetor que deseja-se inicializar
+ * @param tamanho tamanho do vetor
+ */
+void inicializar_vetor(int vetor[], int tamanho, int valor_para_inicializar){
+      for(int i=0; i<tamanho; i++){
+          vetor[i]=valor_para_inicializar;
+      }
+}
+
+struct utente * criar_e_inicializar_utente(int max_consulta_medicas_por_utente){
+    struct utente *utente = (struct utente *)malloc(sizeof(struct utente));
+    /* passando sizeof(int) para o malloc, ele vai alocar memória
+     * para uma variável do tipo inteiro. O sizeof descobre quantos bytes
+     * de memória o tipo indicado (neste caso int) precisa.
+     * Usando apenas malloc(sizeof(int)) ele vai então alocar memória
+     * para um único inteiro. Multiplicando o sizeof(int) por uma determinada
+     * quantidade, vai fazer com que seja alocada memória para a quantidade
+     * de números inteiros indicada, criando dinamicamente um vetor de inteiros.
+     */
+    utente->retorno_medicos= malloc(sizeof(int) * max_consulta_medicas_por_utente);
+    utente->exames_medicos = malloc(sizeof(int) * max_consulta_medicas_por_utente);
+    
+    /*O valor -1 indica que a posição nunca foi preenchida.
+     No caso do vetor de exames, indica que o utente ainda não 
+     passou pelo médico da posição indicada.
+     No caso do vetor retorno_medicos indica que o utente ainda
+     não foi atendido por aquele médico*/
+    inicializar_vetor(utente->retorno_medicos, max_consulta_medicas_por_utente, -1);
+    inicializar_vetor(utente->exames_medicos, max_consulta_medicas_por_utente, -1);
+    return utente;
+}

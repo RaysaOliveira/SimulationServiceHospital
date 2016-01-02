@@ -102,11 +102,26 @@ int gerar_exame();
 int escolher_exame();
 
 /**
+ * Gera o total de exames para cada utente.
+ * @param sim
+ * @return 
+ */
+int gerar_total_exames(simulacao *sim);
+
+/**
  * Gera um tempo aleatório de atendimento para um utente em uma fase.
  * @param fase Fase para qual deseja-se gerar um tempo de atendimento aleatório para um utente
  * @return número aleatorio que representa o tempo de atendimento na fase. 
  */
 int gerar_duracao_atendimento(struct fase *fase);
+/**
+ * Decide aleatoriamente se o utente irá para outro médico ou não,
+ * caso ele não tenha feito o máximo de consultas permitido.
+ * 
+ *
+ * @return 1 se o utente vai para outro médico, ou 0 caso contrário
+ */
+int vai_para_outro_medico(simulacao *sim, struct utente *utente);
 
 int total_utentes_atualmente_em_fila(struct fase fase);
 int total_utentes_atualmente_em_fila_em_todas_as_fases(struct fase fases[TOTAL_FASES]);
@@ -124,5 +139,21 @@ int total_utentes_chegados_no_sistema(simulacao sim);
  * @param sim
  */
 void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim);
+
+/**
+ * Retorna a proxima posicao livre no vetor de exames
+ * @param sim
+ * @param utente
+ * @return o indice da posicao livre ou -1 caso todas as posicoes estejam preenchidas
+ */
+int encontrar_idx_proxima_posicao_livre_exame(simulacao *sim, struct utente *utente);
+
+int encontrar_idx_ultima_posicao_preenchida_exame(simulacao *sim, struct utente *utente);
+
+int encontrar_idx_proxima_posicao_livre_retorno_medico(simulacao *sim, struct utente *utente);
+int encontrar_idx_ultima_posicao_preenchida_retorno_medico(simulacao *sim, struct utente *utente);
+
+int total_medicos_consultados_pelo_utente(simulacao *sim, struct utente *utente);
 #endif	/* SIMULACAO_H */
+
 

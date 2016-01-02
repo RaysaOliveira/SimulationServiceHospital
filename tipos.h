@@ -23,8 +23,10 @@ struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
     int prioridade;  
     
     /**
-     * vetor para controlar os retornos aos medicos. O tamanho max dele é 
-     * a quantidade maxima de medicos que o utente pode consultar.
+     * vetor para controlar os retornos aos medicos. O tamanho máximo dele é 
+     * a quantidade máxima de medicos que o utente pode consultar.
+     * Cada posição do vetor indica se o utente retornou ou náo
+     * no médico de mesmo número do índice indicado.
      * 0 indica que o utente nao retornou no medico da posicao indicada e
      * um que já retornou. 
      */
@@ -33,6 +35,11 @@ struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
     /**
      * vetor para controlar o total de exames solicitados por cada médico. O tamanho max dele é 
      * a quantidade maxima de medicos que o utente pode consultar.
+     * Cada posição do vetor indica se o médico do índice indicado 
+     * já prescreveu exames ao utente ou não.
+     * Usando tal vetor também é possível saber por quantos
+     * médicos o utente já passou (basta contar o total de posições
+     * cujo valor é diferente de -1)
      */
     int * exames_medicos;
 };
@@ -97,10 +104,17 @@ struct fase{
 
  typedef struct simulacao {
     long seed;
-    int total_maximo_consulta_medicas_por_utente;
+    int max_consulta_medicas_por_utente;
     double intervalo_medio_entre_chegadas_utentes;
     int total_minutos_simulacao;
     struct fase fases[TOTAL_FASES];
+    /**
+     * Fila para guardar todos os utentes que já finalizaram
+     * todos os atendimentos necessários para eles.
+     * Tal fila não faz parte de fato do fluxo da simulação,
+     * é usada apenas para calcular as estatísicas no final.
+     */
+    struct fila *fila_utentes_finalizados;
     int minuto_atual;
 } simulacao;
 

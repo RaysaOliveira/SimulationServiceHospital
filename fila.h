@@ -55,5 +55,7 @@ int calcular_tempo_partida_do_utente_na_fila(struct status_fase fase);
  * @return o utente removido ou NULL caso todas as filas estejam vazias. 
  */
 struct utente * pesquisar_todas_as_filas_e_remover_utente_maior_prioridade(struct fase * fase);
+
+struct utente * criar_e_inicializar_utente(int max_consulta_medicas_por_utente);
 #endif	/* FILA_H */
 

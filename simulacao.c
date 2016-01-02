@@ -63,6 +63,8 @@ void inicializar_simulacao(simulacao *sim,
         inicializar_servidores_fase(&sim->fases[i]);        
         inicializar_filas_fase(&sim->fases[i]);
     }
+    
+    sim->fila_utentes_finalizados = inicializar_fila();
 }
 
 int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar){
@@ -150,6 +152,18 @@ int gerar_exame() {
     return 0;
 }
 
+int vai_para_outro_medico(simulacao *sim, struct utente *utente){
+    float aleatorio = ran0(&seed);
+    
+    
+    if(total_medicos_consultados_pelo_utente(sim, utente) < sim->max_consulta_medicas_por_utente
+    && aleatorio > 0.5) {
+        return 1;
+    }
+    
+    return 0;    
+}
+
 int escolher_exame() {
 
     float aleatorio = ran0(&seed);
@@ -196,6 +210,13 @@ int gerar_duracao_atendimento(struct fase *fase){
     int resto = (aleatorio % (fase->tempo_max_atendimento - tempo_minimo_atendimento));
     
     return resto + tempo_minimo_atendimento;
+}
+
+int gerar_total_exames(simulacao *sim){
+    int aleatorio = ran0(&seed) * 10;
+    int resto = aleatorio % (sim->max_consulta_medicas_por_utente+1);
+    
+    return resto;
 }
 
 int total_utentes_atualmente_em_fila(struct fase fase){
@@ -248,5 +269,44 @@ void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim){
         free(sim->fases[i].filas);
         //Libera o vetor de servidores da fase
         free(sim->fases[i].servidores);
+    }  
+    limpar_fila(sim->fila_utentes_finalizados);
+}
+
+int encontrar_idx_proxima_posicao_livre_exame(simulacao *sim, struct utente *utente){
+    for(int i=0; i<sim->max_consulta_medicas_por_utente; i++){
+        if (utente->exames_medicos[i] == -1)
+            return i;
     }
+    return -1;
+}
+
+int encontrar_idx_ultima_posicao_preenchida_exame(simulacao *sim, struct utente *utente){
+    /*a última posição preenchida do vetor de exame
+     é a posição anterior a última livre*/
+    return encontrar_idx_proxima_posicao_livre_exame(sim, utente) - 1;
+}
+
+
+int encontrar_idx_proxima_posicao_livre_retorno_medico(simulacao *sim, struct utente *utente){
+    for(int i=0; i<sim->max_consulta_medicas_por_utente; i++){
+        if (utente->retorno_medicos[i] == -1)
+            return i;
+    }
+    return -1;
+}
+
+int encontrar_idx_ultima_posicao_preenchida_retorno_medico(simulacao *sim, struct utente *utente){
+    /*a última posição preenchida do vetor retorno_medico
+     é a posição anterior a última livre*/
+    return encontrar_idx_proxima_posicao_livre_retorno_medico(sim, utente) - 1;
+}
+
+int total_medicos_consultados_pelo_utente(simulacao *sim, struct utente *utente){
+    int total_medicos_consultados = 0;
+    for(int i=0; i<sim->max_consulta_medicas_por_utente; i++){
+        if (utente->exames_medicos[i] != -1)
+            total_medicos_consultados++;
+    }
+    return total_medicos_consultados;
 }
