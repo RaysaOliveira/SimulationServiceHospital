@@ -42,6 +42,13 @@ struct utente{ //tydef renomear o tipo. Ex: struct pessoa para pessoa;
      * cujo valor é diferente de -1)
      */
     int * exames_medicos;
+    
+    /** Indica o total de atendimentos médicos completos do utente.
+     * Representa o total de vezes que o utente seguiu o fluxo de ir ao médico,
+     * fazer exames e retornar ao médico para apresentar tais exames.
+     * Cada vez que ele concluir este fluxo, tal variável é incrementada
+     */
+    int total_atendimentos_concluidos;    
 };
 
 typedef struct node{//no node tem pessoa e prox
@@ -76,7 +83,9 @@ struct fase{
     int total_filas;
     
     /**
-     * Tempo máximo que o cliente vai levar para ser atendido na fase
+     * Após ser chamado pelo servidor, este é o tempo máximo que o utente vai 
+     * levar para ser atendido pelo servidor na fase (logo, não é o tempo máximo de
+     * espera, que normalmete será maior que este valor).
      */
     int tempo_max_atendimento;
     

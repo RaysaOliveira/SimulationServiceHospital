@@ -76,7 +76,6 @@ int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar){
 
 int gerar_prioridade() {
     float aleatorio = ran0(&seed);
-
     /*
      * @todo É preciso definir tais probabilidades por parâmetro de linha de comando
      * Exemplos de probabilidades. É preciso ordenar as prioridades para que 
@@ -100,10 +99,10 @@ int gerar_prioridade() {
 int gerar_atendimento(int *total_atendimento) {
     float aleatorio = ran0(&seed);
 
-    /*@todo
+    /* @todo
      * As probabilidades serao definidas e passadas por paramentro para função;
      * Aqui vou utilizar estas probabilidades:
-     * [0.0...0,5] - ser atendido
+     * [0.0...0.5] - ser atendido
      * ]0.5...1.0] nao ser atendido
      */
 
@@ -155,8 +154,7 @@ int gerar_exame() {
 int vai_para_outro_medico(simulacao *sim, struct utente *utente){
     float aleatorio = ran0(&seed);
     
-    
-    if(total_medicos_consultados_pelo_utente(sim, utente) < sim->max_consulta_medicas_por_utente
+    if(utente->total_atendimentos_concluidos < sim->max_consulta_medicas_por_utente
     && aleatorio > 0.5) {
         return 1;
     }
@@ -289,7 +287,7 @@ int encontrar_idx_ultima_posicao_preenchida_exame(simulacao *sim, struct utente 
 
 
 int encontrar_idx_proxima_posicao_livre_retorno_medico(simulacao *sim, struct utente *utente){
-    for(int i=0; i<sim->max_consulta_medicas_por_utente; i++){
+    for(int i=0; i <sim->max_consulta_medicas_por_utente; i++){
         if (utente->retorno_medicos[i] == -1)
             return i;
     }
@@ -300,13 +298,4 @@ int encontrar_idx_ultima_posicao_preenchida_retorno_medico(simulacao *sim, struc
     /*a última posição preenchida do vetor retorno_medico
      é a posição anterior a última livre*/
     return encontrar_idx_proxima_posicao_livre_retorno_medico(sim, utente) - 1;
-}
-
-int total_medicos_consultados_pelo_utente(simulacao *sim, struct utente *utente){
-    int total_medicos_consultados = 0;
-    for(int i=0; i<sim->max_consulta_medicas_por_utente; i++){
-        if (utente->exames_medicos[i] != -1)
-            total_medicos_consultados++;
-    }
-    return total_medicos_consultados;
 }

@@ -82,11 +82,11 @@ void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase){
          printf("Prior %2d | ", utente->prioridade);
     else printf("      %2s | ", "-");
     
-    printf("chegada %3d ", utente->status_fase[indice_fase].tempo_chegada);
+    printf("cheg. %3d ", utente->status_fase[indice_fase].tempo_chegada);
     int inicio = utente->status_fase[indice_fase].tempo_inicio_atendimento;
     if(inicio > 0)
-         printf("inicio atend %3d ", inicio);
-    else printf("             %3s ", "-");
+         printf("inic. atend %3d ", inicio);
+    else printf("            %3s ", "-");
     
     int duracao = utente->status_fase[indice_fase].duracao_atendimento;
     if(duracao > 0)
@@ -103,13 +103,13 @@ void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase){
          printf("espera %3d", espera);
     else printf("       %3s", "-");
     
-    printf(" Ex. ");
-    for(int i = 0; i < 2; i++)
+    printf(" Exa. ");
+    for(int i = 0; i < 2 && utente->exames_medicos[i] != -1; i++)
          printf("%2d ", utente->exames_medicos[i]);
     
     
     printf("\n");
-}\
+}
 
 void listar(struct fila *f){
     if(vazia(f)) {
@@ -165,6 +165,7 @@ struct utente * criar_e_inicializar_utente(int max_consulta_medicas_por_utente){
      */
     utente->retorno_medicos= malloc(sizeof(int) * max_consulta_medicas_por_utente);
     utente->exames_medicos = malloc(sizeof(int) * max_consulta_medicas_por_utente);
+    utente->total_atendimentos_concluidos = 0;
     
     /*O valor -1 indica que a posição nunca foi preenchida.
      No caso do vetor de exames, indica que o utente ainda não 

@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 //como o incluide foi criado por mim, nao coloca <> e sim entre ""
@@ -105,55 +106,57 @@ void inserir_utente_fila_finalizados(simulacao *sim, struct fase *fase_atual, st
     imprimir_utente("fila finaliz.", utente, fase_atual->numero_fase);
 }
 
-void redirecionar_utente_fase_exame(simulacao *sim, struct fase *fase_atual, struct utente *utente){
-    int idx_posicao_livre = encontrar_idx_proxima_posicao_livre_exame(sim, utente);
-    /*Se o índice retornado for -1, indica que todas as posições do vetor de exames
-     * estão ocupadas. Isto indica que o utente já consultou com o máximo
-     * de médicos permitido. Mesmo que um médico não tenha prescrito nenhum
-     * exame, o vetor exame na posição do médico atual será setado com 0
-     * para indicar isso.
-     * 
-     */
-    if(idx_posicao_livre > -1) {
-        int total_exames_utente = gerar_total_exames(sim);
-        utente->exames_medicos[idx_posicao_livre] = total_exames_utente;
-        /*Se o utente não tem exames, ele sai do sistema
-         e é guardado na fila de finalizados para 
-         computar estatísticas no final da simulaçao*/
-        //@todo tem que verificar se o utente já passou por 2 médicos
-        if(total_exames_utente==0){
-             /*Redireciona o utente para uma fila da mesma fase para
-              que ele aguarde atendimento de outro médico*/
-             if(vai_para_outro_medico(sim, utente)) 
-                redirecionar_utente_para_fase_seguinte(fase_atual, utente, sim->minuto_atual); 
-             else inserir_utente_fila_finalizados(sim, fase_atual, utente);
-        } else {
-            struct fase *fase_seguinte = &sim->fases[fase_atual->numero_fase+1];
-            redirecionar_utente_para_fase_seguinte(fase_seguinte, utente, sim->minuto_atual); 
-        }
+/**
+ * Verifica se o utente passado deve ser redirecionado para a fase de exames.
+ * Caso seja, redireciona o mesmo.
+ * @param sim
+ * @param fase_atual Fase atual da simulação
+ * @param utente Utente a ser redirecionado para a fase de exames
+ */
+void verificar_e_redirecionar_utente_fase_exame(simulacao *sim, struct fase *fase_atual, struct utente *utente){
+    int idx_medico_atual = utente->total_atendimentos_concluidos;
+    int total_exames_utente = gerar_total_exames(sim);
+    utente->exames_medicos[idx_medico_atual] = total_exames_utente;
+    /*Se o utente não tem exames, ele sai do sistema
+     e é guardado na fila de finalizados para 
+     computar estatísticas no final da simulaçao*/
+    if(total_exames_utente==0){
+        /*como o utente não fará exames, ele não
+         retornan ao médico. Assim, seta o retorno 
+         para o médico atual como zero para indicar que ele já 
+         passou pelo médico mas náo retorna.*/
+        utente->retorno_medicos[idx_medico_atual] = 0;
+        utente->total_atendimentos_concluidos++;
+        /*Redireciona o utente para uma fila da mesma fase para
+          que ele aguarde atendimento de outro médico*/
+        if(vai_para_outro_medico(sim, utente)) 
+            redirecionar_utente_para_fase_seguinte(fase_atual, utente, sim->minuto_atual); 
+        else inserir_utente_fila_finalizados(sim, fase_atual, utente);
+    } else {
+        struct fase *fase_seguinte = &sim->fases[fase_atual->numero_fase+1];
+        redirecionar_utente_para_fase_seguinte(fase_seguinte, utente, sim->minuto_atual); 
     }
 }
 
 void finalizar_atendimento_utente_fase_medico(simulacao *sim, struct fase *fase_atual, struct utente *utente){
-    int idx_ultima_posicao_preenchida_retorno_medico =
-       encontrar_idx_ultima_posicao_preenchida_retorno_medico(sim, utente);
-    /*Se o utente está retornando ao médico*/
-    if(utente->retorno_medicos[idx_ultima_posicao_preenchida_retorno_medico]==1)
-        inserir_utente_fila_finalizados(sim, fase_atual, utente); 
-    else redirecionar_utente_fase_exame(sim, fase_atual, utente);
+    int idx_medico_atual = utente->total_atendimentos_concluidos;
+    //se está retornando ao médico atual
+    if(utente->retorno_medicos[idx_medico_atual]==1){
+        utente->total_atendimentos_concluidos++;
+        if(vai_para_outro_medico(sim, utente))
+            redirecionar_utente_para_fase_seguinte(fase_atual, utente, sim->minuto_atual);
+        else inserir_utente_fila_finalizados(sim, fase_atual, utente); 
+    }
+    else verificar_e_redirecionar_utente_fase_exame(sim, fase_atual, utente);
 }
 
 void finalizar_atendimento_utente_fase_exame(simulacao *sim, struct fase *fase_atual, struct utente *utente){
-    /* O índice da última posição preenchida do vetor de exames
-     * representa também o índice do médico para onde o utente deve retornar */
-    int idx_posicao_livre = encontrar_idx_ultima_posicao_preenchida_exame(sim, utente);
-    if(idx_posicao_livre > -1){
-        /*indica que o utente agora vai retornar ao médico após ter finalizado os exames
-        solicitados por ele*/
-        utente->retorno_medicos[idx_posicao_livre] = 1;
-        struct fase *fase_anterior = &sim->fases[fase_atual->numero_fase-1];
-        redirecionar_utente_para_fase_seguinte(fase_anterior, utente, sim->minuto_atual);         
-    }
+    int idx_medico_atual = utente->total_atendimentos_concluidos;
+    /*indica que o utente agora vai retornar ao médico após ter finalizado os exames
+    solicitados por ele*/
+    utente->retorno_medicos[idx_medico_atual] = 1;
+    struct fase *fase_anterior = &sim->fases[fase_atual->numero_fase-1];
+    redirecionar_utente_para_fase_seguinte(fase_anterior, utente, sim->minuto_atual);         
 }
 
 /**
@@ -202,7 +205,29 @@ void chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(simulacao *sim
     }
 }
 
-int main(int argc, char** argv) {
+void analisa_parametros(simulacao *sim, int argc, char** argv){
+    printf("\nTotal de parâmetros recebidos via linha de comando: %d\n", argc);
+    printf("Lista de parâmetros\n");
+    for(int i = 0; i < argc; i++){
+        printf("%d - %s\n", i, argv[i]);
+        if(strcmp(argv[i], "-p1")==0){
+            if(argv[i+1]==NULL){
+            }
+        }
+    }
+    printf("\n");
+}
+
+/**
+ * Inicia o programa
+ * @param argc Indica o total de parâmetros recebidos pelo programa via linha
+ * de comando. O nome do programa já é o primeiro parâmetro. Assim, o valor
+ * mínimo de argc é 1
+ * @param argv É um vetor de strings onde cada string representa um parâmetro 
+ * recebido via linha de comando.
+ * @return 
+ */
+int main(int argc, char** argv) {    
     /*Parâmetros da simulação*/
     struct simulacao sim;
     
@@ -213,10 +238,11 @@ int main(int argc, char** argv) {
     sim.max_consulta_medicas_por_utente=2;
     sim.intervalo_medio_entre_chegadas_utentes = 8.5;
     sim.total_minutos_simulacao = 80;
-    sim.max_consulta_medicas_por_utente = 2;
     int total_servidores_fases[TOTAL_FASES] = {2, 2, 4, 2};
     int total_filas_fases[TOTAL_FASES] = {1, 4, 4, 4};
-    int tempo_max_atendimento_fases[TOTAL_FASES]={8, 15, 40, 50};
+    int tempo_max_atendimento_fases[TOTAL_FASES] = {8, 15, 40, 50};
+
+    analisa_parametros(&sim, argc, argv);
     
     inicializar_simulacao(&sim, total_filas_fases, total_servidores_fases, tempo_max_atendimento_fases);        
     
@@ -246,10 +272,11 @@ int main(int argc, char** argv) {
     printf("\nFinalização do atendimento de todos os utentes no minuto %d\n\n", sim.minuto_atual);
     printf("Total geral de pessoas que chegaram: %d\n", total_utentes_chegados_no_sistema(sim));
     
-    printf("\nUtentes finalizados\n");
-    listar(sim.fila_utentes_finalizados);
+    //printf("\nUtentes finalizados\n");
+    //listar(sim.fila_utentes_finalizados);
     
     liberar_filas_servidores_e_utentes_simulacao(&sim);
+    
     return 0;
 }
 
