@@ -4,9 +4,9 @@
 
 
 /**
- * O lambda é 1/a media do tempo de chegada;
+ * O lambda é 1/(média do tempo de chegada);
  */
-double lambda;
+float lambda;
 
 /**
  * Inicializa todas as fases da simulação, o que inclui criar
@@ -38,13 +38,13 @@ int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar);
  * Inicializa o gerador
  * @param mean A média desejada para o gerador Poisson
  */
-void inicializar_poisson(double mean);
+void inicializar_poisson(float mean);
 
 /**
  * Gera um número pseudo aleatório seguindo a distribuição de Poisson.
  * Fonte: http://preshing.com/20111007/how-to-generate-random-timings-for-a-poisson-process/  
  */
-double poisson();
+float poisson();
 
 /**
  * Seta os parâmetros a serem utilizados para executar a simulação,
@@ -66,15 +66,6 @@ void inicializar_seed(long seed);
  * 3 = verde
  */
 int gerar_prioridade();
-
-
-/**
- * Defini se o utente vai ser atendido novamente ou não. 
- * Ele nao será atendido novamente se ele ja foi atendido por 2 medicos.
- * @param total_atendimento total de vezes que o utente foi atendido.
- * @return 0 caso o utente não seja atendido e 1 se ele for atendido
- */
-int gerar_novo_atendimento_medico(int *total_atendimento);
 
 /**
  * Escolhe aleatoriamente uma de 4 especialidades;
@@ -113,12 +104,7 @@ int total_utentes_atualmente_em_fila(struct fase fase);
 int total_utentes_atualmente_em_fila_em_todas_as_fases(struct fase fases[TOTAL_FASES]);
 int total_utentes_em_atendimento(struct fase fase);
 int total_utentes_em_atendimento_em_todas_fases(struct fase fases[TOTAL_FASES]);
-/**
- * 
- * @param sim
- * @return total geral de utentes que chegaram no sistema.
- */
-int total_utentes_chegados_no_sistema(simulacao sim);
+
 
 /**
  * Libera todas as variáveis alocadas dinamicamente para a simulação

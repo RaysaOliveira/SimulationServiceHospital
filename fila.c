@@ -15,7 +15,6 @@ struct fila * inicializar_fila(){
     f->inicio = NULL;
     f->fim = NULL;
     f->quant_atual = 0;
-    f->total_utentes_chegados = 0;
     return f;
 }
 
@@ -53,7 +52,6 @@ int inserir(struct utente * utente, struct fila *f){
     
     f->fim=novo;
     f->quant_atual++;
-    f->total_utentes_chegados++;
     
     //se chegou aqui, retorna 1 para indicar que o novo foi inserido na fila
     return 1;

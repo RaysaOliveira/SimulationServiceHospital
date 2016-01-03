@@ -11,19 +11,26 @@
 #include <math.h>
 #include <stdio.h>
 
-static long seed = 9346L;
+/* Caso a função para inicializar a seed nao for chamada, usa este valor para a seed. 
+ */
+static long seed;
 
 void inicializar_seed(long seed1) {
     seed = seed1;
+    srand(seed);
 }
 
-void inicializar_poisson(double mean) {
+void inicializar_poisson(float mean) {
     lambda = 1.0/mean;
 }
 
-double poisson() {
+float poisson() {
     float aleatorio = ran0(&seed);
-    return -logf(1.0f - aleatorio) / lambda;
+    //printf("u %.2f lambda %.2f\n", aleatorio, lambda);
+    float p = -logf(1.0f - aleatorio) / lambda;
+    
+    /*divide por 100 para gerar valores entre 0 e 1 e não entre 0 e 100*/
+    return p/100.0;
 }
 
 void inicializar_servidores_fase(struct fase *fase){
@@ -54,7 +61,7 @@ void inicializar_simulacao(simulacao *sim,
     inicializar_seed(sim->seed);
     //Inicializa o gerador com a média desejada
     inicializar_poisson(sim->intervalo_medio_entre_chegadas_utentes);
-    
+    sim->total_utentes_chegaram = 0;
     for(int i = 0; i < TOTAL_FASES; i++){
         sim->fases[i].numero_fase = i;
         sim->fases[i].total_filas = total_filas_fase[i];
@@ -102,22 +109,6 @@ int gerar_prioridade(simulacao *sim) {
     return 2;
 }
 
-int gerar_novo_atendimento_medico(int *total_atendimento) {
-    float aleatorio = ran0(&seed);
-
-    /* @todo As probabilidades serao definidas e passadas por paramentro para função;
-     * Aqui vou utilizar estas probabilidades:
-     * [0.0...0.5] - ser atendido
-     * ]0.5...1.0] nao ser atendido
-     */
-
-    if (aleatorio > 0.5 && *total_atendimento < 2) {
-        (*total_atendimento)++;
-        return 1;
-    }
-    return 0;
-}
-
 int escolher_especialidade(simulacao *sim) {
     float aleatorio = ran0(&seed);
 
@@ -150,6 +141,7 @@ int vai_para_outro_medico(simulacao *sim, struct utente *utente){
     
     return 0;    
 }
+
 
 int gerar_duracao_atendimento(struct fase *fase){
     int tempo_minimo_atendimento = 5;
@@ -215,13 +207,6 @@ int total_utentes_em_atendimento_em_todas_fases(struct fase fases[TOTAL_FASES]){
     return total_utentes;
 }
 
-int total_utentes_chegados_no_sistema(simulacao sim){
-    int total_utentes_chegados=0;
-    for(int i=0;i<sim.fases[0].total_filas; i++){
-        total_utentes_chegados += sim.fases[0].filas[i]->total_utentes_chegados;
-    }    
-    return total_utentes_chegados;
-}
 
 void liberar_filas_servidores_e_utentes_simulacao(simulacao *sim){
     //Libera todas as filas criadas em cada fase

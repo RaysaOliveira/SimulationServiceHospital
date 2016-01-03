@@ -1,5 +1,5 @@
-total_minutos_simulacao = 75
-total_simulacoes = 2
+total_minutos_simulacao = 80x       
+total_simulacoes = 200
 max_consulta_medicas_por_utente = 2
 probabilidade_de_utente_consultar_com_segundo_medico = 0.5
 total_servidores_fase0 = 2

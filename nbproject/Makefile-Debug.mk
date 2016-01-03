@@ -40,7 +40,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/parametros.o \
 	${OBJECTDIR}/random.o \
-	${OBJECTDIR}/simulacao.o
+	${OBJECTDIR}/simulacao.o \
+	${OBJECTDIR}/twister.o
 
 
 # C Compiler Flags
@@ -96,6 +97,11 @@ ${OBJECTDIR}/simulacao.o: simulacao.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/simulacao.o simulacao.c
+
+${OBJECTDIR}/twister.o: twister.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/twister.o twister.c
 
 # Subprojects
 .build-subprojects:

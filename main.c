@@ -19,10 +19,10 @@
 #include "estatisticas.h"
 
 void inserir_utente_na_fila_fase1(simulacao *sim){
-    /*Se o minuto atual for menor que o valor 
-    atual de poisson vai chegar um cliente. se não, nao chega cliente no momento.
+    /* Se o resultado do poisson for menor que o  minuto atual, indica que vai chegar um cliente. 
+     * Senão, nao chega cliente no momento.
     */
-    if(sim->minuto_atual < poisson()) { 
+    if(poisson() < sim->minuto_atual) { 
         struct utente *utente = criar_e_inicializar_utente(sim->max_consulta_medicas_por_utente);
         
         // -1 indica que nao foi definida nenhuma prioridade para esta fase
@@ -34,12 +34,12 @@ void inserir_utente_na_fila_fase1(simulacao *sim){
         int indice_fila = 0;
         if(sim->fases[0].total_filas > 1)
             indice_fila = utente->prioridade;
-        utente->id = sim->fases[0].filas[indice_fila]->total_utentes_chegados; 
         utente->status_fase[0].tempo_chegada=sim->minuto_atual;
         utente->status_fase[0].tempo_inicio_atendimento = 0;
         utente->status_fase[0].duracao_atendimento = 0;
         utente->status_fase[0].tempo_partida = 0;
         inserir(utente, sim->fases[0].filas[indice_fila]);
+        sim->total_utentes_chegaram++;
         if(sim->imprimir_dados_utentes_individuais)
             imprimir_utente("inserido     ", utente, 0);
     }
@@ -216,14 +216,30 @@ void chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(simulacao *sim
 }
 
 int main(int argc, char** argv) {  
-    /* 
+    
+    
     //verifica se a média das somas das chamadas de poisson() bate com a média do intervalo médio entre chegadas
-    int i, total_minutos = 80;
-    float soma = 0;
-    for(i = 0; i < total_minutos; i++)
-        soma += poisson();
-    printf("média: %f\n\n", soma/total_minutos); 
-    */
+    int total_minutos = 360, total_chegados=0;
+    float inter_chegada = 8;
+    long seed = time(NULL);
+    inicializar_seed(seed);
+    inicializar_poisson(inter_chegada);
+    float soma = 0, p, u;
+    for(int minuto = 1; minuto <= total_minutos; minuto++) {
+        p = poisson();
+        u = ran0(&seed);
+        if(u < p){
+            total_chegados++;
+            printf("minuto: %3d uniforme: %.2f poisson: %.2f soma: %f - chegou\n", minuto, u, p, soma); 
+        } else printf("minuto: %3d uniforme: %.2f poisson: %.2f soma: %f\n", minuto, u, p, soma); 
+        soma += p;
+        
+    }
+    float media = soma/total_minutos * 100;
+    printf("média: %f total utentes: %d tempo simulação: %d\n\n", media, total_chegados, total_minutos); 
+    return 0;
+    
+    
     
     struct simulacao sim;
     /*Parâmetros para todas as simulações*/
@@ -260,7 +276,7 @@ int main(int argc, char** argv) {
          Coloque uma seed fixa e verá sempre os mesmos resultados.
          Multiplica a seed por i para garantir que cada simulação terá uma seed
          diferente.*/
-        sim.seed = time(NULL) * (i+1);
+        sim.seed = time(NULL)*(i+1);
 
         //Pega os parâmetros das variáveis acima e seta de fato na struct simulacao
         inicializar_simulacao(&sim, 
@@ -282,14 +298,16 @@ int main(int argc, char** argv) {
         /*Enquanto houver utentes na fila ou sendo atendidos pelos servidores,
          continua a simulação até que todos os utentes tenham terminado de ser atendidos*/
         while(total_utentes_atualmente_em_fila_em_todas_as_fases(sim.fases) > 0 ||
-                total_utentes_em_atendimento_em_todas_fases(sim.fases) >0){
+                total_utentes_em_atendimento_em_todas_fases(sim.fases) > 0){
             ++sim.minuto_atual;
             chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(&sim);
         }
 
         printf("Finalização do atendimento de todos os utentes no minuto %d\n", sim.minuto_atual);
-        printf("Total geral de pessoas que chegaram: %d\n", total_utentes_chegados_no_sistema(sim));
-
+        
+        //printf("Total geral de pessoas que chegaram: %d\n", sim.fila_utentes_finalizados->quant_atual);
+        printf("Total geral de pessoas que chegaram: %d\n", sim.total_utentes_chegaram);
+        
         //printf("\nUtentes finalizados\n");
         //listar(sim.fila_utentes_finalizados);
         

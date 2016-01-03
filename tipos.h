@@ -71,7 +71,6 @@ struct fila{
     node * inicio;
     node * fim;
     int quant_atual;
-    int total_utentes_chegados;
 };
 
 /**
@@ -149,6 +148,7 @@ struct fase{
      * Total de simulações a serem executadas
      */
     int total_simulacoes;
+    int total_utentes_chegaram;
     
     struct fase fases[TOTAL_FASES];
     /**
