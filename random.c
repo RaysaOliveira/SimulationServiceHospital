@@ -7,6 +7,7 @@ void inicializar_seed(long seed){
 }
 
 float rnd () {
+    //divide pelo valor max do twiste para gerar valores entre 0 e 1
     return randomMT() / (float)twister_period();
 }
 

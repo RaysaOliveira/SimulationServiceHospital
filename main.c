@@ -325,6 +325,8 @@ int main(int argc, char** argv) {
                 calcular_todas_estatisticas_todas_simulacoes(vetor_estatisticas, sim.total_simulacoes);
         printf("\nESTATÍSTICAS FINAIS PARA TODAS AS SIMULAÇÕES\n");
         imprimir_estatisticas_uma_simulacao(&estatisticas_finais);
+        printf("\n\tTempo da simulação por rodada: %d minutos \n", sim.total_minutos_simulacao);
+        printf("\tTempo total de simulação: %d minutos \n", sim.total_minutos_simulacao * sim.total_simulacoes);
     }
     return 0;
 }

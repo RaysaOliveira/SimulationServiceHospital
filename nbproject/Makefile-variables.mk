@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=GNU-MacOSX
 CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-MacOSX
-CND_ARTIFACT_NAME_Debug=trab_cc
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-MacOSX/trab_cc
+CND_ARTIFACT_NAME_Debug=trab_cc_raysa_claudia_samuel
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-MacOSX/trab_cc_raysa_claudia_samuel
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-MacOSX/package
-CND_PACKAGE_NAME_Debug=trabcc.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-MacOSX/package/trabcc.tar
+CND_PACKAGE_NAME_Debug=trabccraysaclaudiasamuel.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-MacOSX/package/trabccraysaclaudiasamuel.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-MacOSX
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-MacOSX
-CND_ARTIFACT_NAME_Release=trab_cc
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-MacOSX/trab_cc
+CND_ARTIFACT_NAME_Release=trab_cc_raysa_claudia_samuel
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-MacOSX/trab_cc_raysa_claudia_samuel
 CND_PACKAGE_DIR_Release=dist/Release/GNU-MacOSX/package
-CND_PACKAGE_NAME_Release=trabcc.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-MacOSX/package/trabcc.tar
+CND_PACKAGE_NAME_Release=trabccraysaclaudiasamuel.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-MacOSX/package/trabccraysaclaudiasamuel.tar
 #
 # include compiler specific variables
 #

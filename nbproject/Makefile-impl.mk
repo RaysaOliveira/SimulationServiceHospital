@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Trab_CC
+PROJECTNAME=Trab_CC_Raysa_Claudia_Samuel
 
 # Active Configuration
 DEFAULTCONF=Debug

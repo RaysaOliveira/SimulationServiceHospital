@@ -62,7 +62,7 @@ struct utente{
     int total_atendimentos_concluidos;    
 };
 
-typedef struct node{//no node tem pessoa e prox
+typedef struct node{//no node tem utente e prox
     struct utente *utente;
     struct node * prox; //ponteiro pro proximo node;
 } node;

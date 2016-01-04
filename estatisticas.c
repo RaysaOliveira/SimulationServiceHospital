@@ -12,20 +12,6 @@ float calcular_media(float valores[], int tamanho_vetor){
     return soma/(float)tamanho_vetor;
 }
 
-float square(float num){
-    return num * num;
-}
-
-float desvio_padrao(float valores[], int tamanho_vetor){
-    float soma = 0, media = calcular_media(valores, tamanho_vetor);
-    for(int i = 0; i < tamanho_vetor; i++){
-        soma += square(valores[i] - media);
-    }
-    
-    float n = tamanho_vetor;
-    return sqrt(soma/(n-1));
-}
-
 float media_tempo_espera_fila_por_fase(simulacao *sim, int num_fase){
     int total_utentes = sim->fila_utentes_finalizados->quant_atual;
     node *no = sim->fila_utentes_finalizados->inicio;
