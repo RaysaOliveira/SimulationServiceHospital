@@ -170,7 +170,14 @@ struct fase{
  * Armazena os dados para uma simulação, como médias e desvios padrões.
  */
 struct estatisticas {
-    float media_tempo_espera_fila;
+    int total_utentes_chegados;
+    float media_total_utentes_chegados;
+    float media_tempo_espera_fila_todas_fases;
+    float media_tempo_espera_fila_por_fase[TOTAL_FASES];
+    
+    float media_duracao_atendimento_todas_fases;
+    float media_duracao_atendimento_por_fase[TOTAL_FASES];
+    
 };
 
 

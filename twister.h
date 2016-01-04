@@ -30,6 +30,7 @@ static int      left = -1;      // can *next++ this many times before reloading
 
 void seedMT(uint32 seed);
 uint32 randomMT(void);
+uint32 twister_period();
 
 #endif	/* TWITTER_H */
 

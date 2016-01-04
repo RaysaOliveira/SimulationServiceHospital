@@ -97,7 +97,7 @@ void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase){
          printf("part %3d ", partida);
     else printf("     %3s ", "-");
     
-    int espera = calcular_tempo_espera_na_fila_fase(utente->status_fase[indice_fase]);
+    int espera = calcular_tempo_espera_na_fila_fase(utente, indice_fase);
     if(espera >= 0)
          printf("espera %3d", espera);
     else printf("       %3s", "-");
@@ -126,14 +126,19 @@ void listar(struct fila *f){
     }
 }
 
-int calcular_tempo_espera_na_fila_fase(struct status_fase status_fase){
-    return status_fase.tempo_inicio_atendimento-status_fase.tempo_chegada; 
+int calcular_tempo_espera_na_fila_fase(struct utente *utente, int num_fase){
+    struct status_fase status_fase = utente->status_fase[num_fase];
+    int espera = status_fase.tempo_inicio_atendimento-status_fase.tempo_chegada ;
+    //if(espera < 0 || espera > 100) printf("\t\t#id %d fase %d chegada %d inicio atend %d\n", utente->id, num_fase, status_fase.tempo_chegada, status_fase.tempo_inicio_atendimento);
+
+    return espera; 
 }
 
 int calcular_tempo_partida_do_utente_na_fila(struct status_fase status_fase){
     return status_fase.tempo_inicio_atendimento + status_fase.duracao_atendimento;
 }
 
+//A função vai retirar da fila o utente com maior prioridade, pois a fila começa do 0.
 struct utente * pesquisar_todas_as_filas_e_remover_utente_maior_prioridade(struct fase * fase){
     for(int i=0; i < fase->total_filas; i++){
         if(!vazia(fase->filas[i])){
@@ -155,8 +160,9 @@ void inicializar_vetor(int vetor[], int tamanho, int valor_para_inicializar){
       }
 }
 
-struct utente * criar_e_inicializar_utente(int max_consulta_medicas_por_utente){
+struct utente * criar_e_inicializar_utente(int id, int max_consulta_medicas_por_utente){
     struct utente *utente = (struct utente *)malloc(sizeof(struct utente));
+    utente->id = id;
     /* passando sizeof(int) para o malloc, ele vai alocar memória
      * para uma variável do tipo inteiro. O sizeof descobre quantos bytes
      * de memória o tipo indicado (neste caso int) precisa.
@@ -169,6 +175,13 @@ struct utente * criar_e_inicializar_utente(int max_consulta_medicas_por_utente){
     utente->exames_medicos = malloc(sizeof(int) * max_consulta_medicas_por_utente);
     utente->especialidades_medicas_consultadas = malloc(sizeof(int) * max_consulta_medicas_por_utente);
     utente->total_atendimentos_concluidos = 0;
+    
+    for(int i = 0; i < TOTAL_FASES; i++){
+        utente->status_fase[i].duracao_atendimento = 0;
+        utente->status_fase[i].tempo_chegada = 0;
+        utente->status_fase[i].tempo_inicio_atendimento = 0;
+        utente->status_fase[i].tempo_partida = 0;
+    }
     
     /*O valor -1 indica que a posição nunca foi preenchida.
      No caso do vetor de exames, indica que o utente ainda não 

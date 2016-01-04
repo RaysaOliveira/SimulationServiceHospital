@@ -35,10 +35,11 @@ void imprimir_utente(char mensagem[], struct utente * utente, int indice_fase);
 /**
  * Calcula o tempo de espera na fila para uma determinada fase 
  * de um utente.
- * @param fase fase para qual deseja calcular o tempo de espera
+ * @param utente para qual deseja-se calcular o tempo de espera para uma determinada fase
+ * @param num_fase número da fase para qual deseja calcular o tempo de espera
  * @return o tempo de espera do utente na fila da fase indicada.
  */
-int calcular_tempo_espera_na_fila_fase(struct status_fase fase);
+int calcular_tempo_espera_na_fila_fase(struct utente *utente, int num_fase);
 
 /**
  * Calcula o tempo de partida na fila para uma determinada fase 
@@ -56,6 +57,6 @@ int calcular_tempo_partida_do_utente_na_fila(struct status_fase fase);
  */
 struct utente * pesquisar_todas_as_filas_e_remover_utente_maior_prioridade(struct fase * fase);
 
-struct utente * criar_e_inicializar_utente(int max_consulta_medicas_por_utente);
+struct utente * criar_e_inicializar_utente(int id, int max_consulta_medicas_por_utente);
 #endif	/* FILA_H */
 

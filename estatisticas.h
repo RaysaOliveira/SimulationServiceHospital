@@ -10,7 +10,8 @@
 
 #include "tipos.h"
 
-float media_tempo_espera_fila(simulacao *sim);
+float media_tempo_espera_fila_por_fase(simulacao *sim, int num_fase);
+float media_tempo_espera_fila_todas_fases(simulacao *sim);
 struct estatisticas calcular_estatisticas(simulacao *sim);
 struct estatisticas calcular_todas_estatisticas_todas_simulacoes(struct estatisticas vetor_estatisticas[], int tamanho_vetor);
 void imprimir_estatisticas_uma_simulacao(struct estatisticas *estatisticas);

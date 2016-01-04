@@ -11,21 +11,12 @@
 #include <math.h>
 #include <stdio.h>
 
-/* Caso a função para inicializar a seed nao for chamada, usa este valor para a seed. 
- */
-static long seed;
-
-void inicializar_seed(long seed1) {
-    seed = seed1;
-    srand(seed);
-}
-
 void inicializar_poisson(float mean) {
     lambda = 1.0/mean;
 }
 
 float poisson() {
-    float aleatorio = ran0(&seed);
+    float aleatorio = rnd();
     //printf("u %.2f lambda %.2f\n", aleatorio, lambda);
     float p = -logf(1.0f - aleatorio) / lambda;
     
@@ -89,7 +80,7 @@ int servidor_esta_livre(struct utente *servidores[], int posicao_a_verificar){
 }
 
 int gerar_prioridade(simulacao *sim) {
-    float aleatorio = ran0(&seed);
+    float aleatorio = rnd();
     /*
      * Exemplos de probabilidades. É preciso ordenar as prioridades para que 
      * o código funcione:
@@ -110,15 +101,15 @@ int gerar_prioridade(simulacao *sim) {
 }
 
 int escolher_especialidade(simulacao *sim) {
-    float aleatorio = ran0(&seed);
+    float aleatorio = rnd();
 
     /*
      * Exemplos de probabilidades. É preciso ordenar as prioridades para que 
      * o código funcione:
-     [0.0 .. 0.1] = especialidade 0
-     ]0.1 .. 0.3] = especialidade 1
-     ]0.3 .. 0.6] = especialidade 2
-     ]0.6 .. 1.0] = especialidade 3
+     [0.0 .. 0.25] = especialidade 0
+     ]0.25 .. 0.50] = especialidade 1
+     ]0.50 .. 0.75] = especialidade 2
+     ]0.75 .. 1.0] = especialidade 3
      */
 
     if (aleatorio <= sim->probabilidades_especialidade_medica[0])
@@ -132,7 +123,7 @@ int escolher_especialidade(simulacao *sim) {
 }
 
 int vai_para_outro_medico(simulacao *sim, struct utente *utente){
-    float aleatorio = ran0(&seed);
+    float aleatorio = rnd();
     
     if(utente->total_atendimentos_concluidos < sim->max_consulta_medicas_por_utente
     && aleatorio > sim->probabilidade_de_utente_consultar_com_segundo_medico) {
@@ -161,14 +152,14 @@ int gerar_duracao_atendimento(struct fase *fase){
      * Para evitar isso subtraiu-se o tempo_minimo_atendimento do tempo_max_atendimento
      * no momento de calcular o resto. 
      */
-    int aleatorio = ran0(&seed) * 100;
+    int aleatorio = rnd() * 100;
     int resto = (aleatorio % (fase->tempo_max_atendimento - tempo_minimo_atendimento));
     
     return resto + tempo_minimo_atendimento;
 }
 
 int gerar_total_exames(simulacao *sim){
-    int aleatorio = ran0(&seed) * 10;
+    int aleatorio = rnd() * 10;
     int resto = aleatorio % (sim->max_consulta_medicas_por_utente+1);
     
     return resto;

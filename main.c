@@ -19,11 +19,11 @@
 #include "estatisticas.h"
 
 void inserir_utente_na_fila_fase1(simulacao *sim){
-    /* Se o resultado do poisson for menor que o  minuto atual, indica que vai chegar um cliente. 
+    /* Se o resultado do poisson for menor que o rnd(), indica que vai chegar um cliente. 
      * Senão, nao chega cliente no momento.
     */
-    if(poisson() < sim->minuto_atual) { 
-        struct utente *utente = criar_e_inicializar_utente(sim->max_consulta_medicas_por_utente);
+    if(rnd() < poisson()) { 
+        struct utente *utente = criar_e_inicializar_utente(sim->total_utentes_chegaram, sim->max_consulta_medicas_por_utente);
         
         // -1 indica que nao foi definida nenhuma prioridade para esta fase
         utente->prioridade = -1;
@@ -215,36 +215,40 @@ void chamar_utentes_em_espera_e_finalizar_atendimento_dos_utentes(simulacao *sim
     }
 }
 
-int main(int argc, char** argv) {  
-    
-    
+/**
+ * Função temporária apenas para verificar números de poisson
+ */
+int testar_poisson_e_finalizar_programa_imediatamente(){
     //verifica se a média das somas das chamadas de poisson() bate com a média do intervalo médio entre chegadas
     int total_minutos = 360, total_chegados=0;
     float inter_chegada = 8;
     long seed = time(NULL);
     inicializar_seed(seed);
     inicializar_poisson(inter_chegada);
-    float soma = 0, p, u;
+    float soma = 0, num_poisson, num_uniforme;
     for(int minuto = 1; minuto <= total_minutos; minuto++) {
-        p = poisson();
-        u = ran0(&seed);
-        if(u < p){
+        num_poisson = poisson();
+        num_uniforme = rnd();
+        if(num_uniforme < num_poisson){
             total_chegados++;
-            printf("minuto: %3d uniforme: %.2f poisson: %.2f soma: %f - chegou\n", minuto, u, p, soma); 
-        } else printf("minuto: %3d uniforme: %.2f poisson: %.2f soma: %f\n", minuto, u, p, soma); 
-        soma += p;
+            printf("minuto: %3d uniforme: %.2f poisson: %.2f soma: %f - chegou\n", minuto, num_uniforme, num_poisson, soma); 
+        } else printf("minuto: %3d uniforme: %.2f poisson: %.2f soma: %f\n", minuto, num_uniforme, num_poisson, soma); 
+        soma += num_poisson;
         
     }
     float media = soma/total_minutos * 100;
-    printf("média: %f total utentes: %d tempo simulação: %d\n\n", media, total_chegados, total_minutos); 
-    return 0;
+    printf("média: %f total utentes: %d tempo simulação: %d\n\n", media, total_chegados, total_minutos);  
     
-    
+    exit(0);
+}
+
+int main(int argc, char** argv) {  
+    //testar_poisson_e_finalizar_programa_imediatamente();
     
     struct simulacao sim;
     /*Parâmetros para todas as simulações*/
     sim.max_consulta_medicas_por_utente=2;
-    sim.intervalo_medio_entre_chegadas_utentes = 8.5;
+    sim.intervalo_medio_entre_chegadas_utentes = 8;
     sim.total_minutos_simulacao = 80;
     sim.total_simulacoes = 1;
     sim.probabilidade_de_utente_consultar_com_segundo_medico = 0.5;
@@ -304,10 +308,7 @@ int main(int argc, char** argv) {
         }
 
         printf("Finalização do atendimento de todos os utentes no minuto %d\n", sim.minuto_atual);
-        
-        //printf("Total geral de pessoas que chegaram: %d\n", sim.fila_utentes_finalizados->quant_atual);
-        printf("Total geral de pessoas que chegaram: %d\n", sim.total_utentes_chegaram);
-        
+                
         //printf("\nUtentes finalizados\n");
         //listar(sim.fila_utentes_finalizados);
         
@@ -317,9 +318,14 @@ int main(int argc, char** argv) {
         liberar_filas_servidores_e_utentes_simulacao(&sim);
         printf("---------------------------------------------------------------------------\n\n");
     }
-    estatisticas_finais=calcular_todas_estatisticas_todas_simulacoes(vetor_estatisticas, sim.total_simulacoes);
-    printf("\nEstatísticas finais para todas as simulações\n");
-    imprimir_estatisticas_uma_simulacao(&estatisticas_finais);
+    
+    //só exibe os dados gerais para todas as simulações se rodar mais de uma simulação
+    if(sim.total_simulacoes > 1){
+        estatisticas_finais = 
+                calcular_todas_estatisticas_todas_simulacoes(vetor_estatisticas, sim.total_simulacoes);
+        printf("\nESTATÍSTICAS FINAIS PARA TODAS AS SIMULAÇÕES\n");
+        imprimir_estatisticas_uma_simulacao(&estatisticas_finais);
+    }
     return 0;
 }
 

@@ -49,6 +49,9 @@
 #include <stdlib.h>
 #include "twister.h"
 
+uint32 twister_period(){
+    return 0xFFFFFFFFU;
+}
 
 void seedMT(uint32 seed)
  {
@@ -98,11 +101,11 @@ void seedMT(uint32 seed)
     // so-- that's why the only change I made is to restrict to odd seeds.
     //
 
-    register uint32 x = (seed | 1U) & 0xFFFFFFFFU, *s = state;
+    register uint32 x = (seed | 1U) & twister_period(), *s = state;
     register int    j;
 
     for(left=0, *s++=x, j=N; --j;
-        *s++ = (x*=69069U) & 0xFFFFFFFFU);
+        *s++ = (x*=69069U) & twister_period());
  }
 
 
@@ -126,7 +129,7 @@ uint32 reloadMT(void)
     s1 ^= (s1 >> 11);
     s1 ^= (s1 <<  7) & 0x9D2C5680U;
     s1 ^= (s1 << 15) & 0xEFC60000U;
-    return(s1 ^ (s1 >> 18));
+    return (s1 ^ (s1 >> 18));
  }
 
 

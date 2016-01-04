@@ -1,20 +1,23 @@
+/** 
+ * Biblioteca criada para encapsular qual o gerator de números uniformes aleatórios
+ * está sendo usado por todo o sistema. Se for preciso trocar o gerador,
+ * basta trocar as chamadas existentes dentro das funções desta biblioteca pelas
+ * chamadas do novo gerador desejado.
+ *  
+ * File:   estatisticas.h
+ * Author: raysaoliveira
+ *
+ * Created on 2 de Janeiro de 2016, 20:52
+ */
+
 #ifndef RANDOM_H 
 #define RANDOM_H
 
-#define IA 16807
-#define IM 2147483647
-#define AM ((float)1.0/IM)
-#define IQ 127773
-#define IR 2836
-#define MASK 123459876
+void inicializar_seed(long seed);
 
-
-/**
- * Minimal random number generator of Park and Miller. Returns a uniform random deviate
- * between 0.0 and 1.0. Set or reset idum to any integer value (except the unlikely value MASK)
- * to initialize the sequence; idum must not be altered between calls for successive deviates in
- * a sequence
-*/
-float ran0 (long *idum);
+/***
+ * @return um valor aleatoriamente distribuído entre 0 e 1
+ */
+float rnd();
 
 #endif
