@@ -1,5 +1,5 @@
 total_minutos_simulacao = 420    
-total_simulacoes = 200
+total_simulacoes = 1
 max_consulta_medicas_por_utente = 2
 probabilidade_de_utente_consultar_com_segundo_medico = 0.5
 total_servidores_fase0 = 2
@@ -22,4 +22,4 @@ probabilidades_especialidade_medica0 = 0.25
 probabilidades_especialidade_medica1 = 0.50
 probabilidades_especialidade_medica2 = 0.75
 probabilidades_especialidade_medica3 = 1.0
-imprimir_dados_utentes_individuais = 0
+imprimir_dados_utentes_individuais = 1

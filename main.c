@@ -248,7 +248,7 @@ int main(int argc, char** argv) {
     struct simulacao sim;
     /*Parâmetros para todas as simulações*/
     sim.max_consulta_medicas_por_utente=2;
-    sim.intervalo_medio_entre_chegadas_utentes = 8;
+    sim.intervalo_medio_entre_chegadas_utentes = 8.0;
     sim.total_minutos_simulacao = 80;
     sim.total_simulacoes = 1;
     sim.probabilidade_de_utente_consultar_com_segundo_medico = 0.5;

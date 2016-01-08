@@ -17,8 +17,9 @@ void inicializar_poisson(float mean) {
 
 float poisson() {
     float aleatorio = rnd();
-    //printf("u %.2f lambda %.2f\n", aleatorio, lambda);
+    //printf("u %.2f \n", aleatorio);
     float p = -logf(1.0f - aleatorio) / lambda;
+    //printf("poisson %.2f", p);
     
     /*divide por 100 para gerar valores entre 0 e 1 e não entre 0 e 100*/
     return p/100.0;
