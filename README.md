@@ -1,4 +1,2 @@
-# SimulacaoAtendimentoHospital
-# SimulacaoAtendimentoHospital
-# SimulationServiceHospital
+
 # SimulationServiceHospital
